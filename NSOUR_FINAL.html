@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nsour Gold Explorer</title>
+<style>
+:root{--bg:#07120f;--panel:#0d1b17;--panel2:#10231d;--line:#234638;--gold:#d8b451;--gold2:#f0d67a;--text:#f4f7f5;--muted:#9fb5ab;--green:#2f7d5b;--bad:#db7467}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07120f,#091711 45%,#06100d);color:var(--text);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(7,18,15,.94);border-bottom:1px solid rgba(216,180,81,.18)}
+.topbar{max-width:1400px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;min-width:290px}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#10231d;border:1px solid rgba(216,180,81,.35);color:var(--gold2);font-weight:700}
+.brand h1{margin:0;font-size:18px;color:var(--gold2)}.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+nav{display:flex;gap:6px;flex:1;justify-content:center}nav button{border:0;background:transparent;color:#b9c9c1;padding:10px 13px;border-radius:12px;cursor:pointer}nav button.active,nav button:hover{background:#12271f;color:var(--gold2)}
+.status{font-size:12px;color:#c9dfd4;background:#0d211a;border:1px solid #214536;padding:8px 11px;border-radius:999px}
+main{max-width:1400px;margin:auto;padding:20px}.card{background:linear-gradient(180deg,rgba(16,35,29,.96),rgba(10,24,19,.96));border:1px solid rgba(151,182,167,.14);border-radius:20px;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.authbar{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;padding:16px;margin-bottom:18px}.authinfo h3{margin:0 0 7px;color:var(--gold2)}.authinfo p{margin:0;color:#adc2b8;font-size:13px;line-height:1.55}
+.authform{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center}.authform input{min-width:0;background:#07140f;border:1px solid #244638;color:#fff;padding:10px 11px;border-radius:10px;outline:none}.btn{border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:600}.btn.primary{background:var(--gold);color:#142017}.btn.secondary{background:#163428;color:#d7e9e0}.btn.ghost{background:#0b1a15;color:#c5d7ce;border:1px solid #244638}
+.authmsg{grid-column:1/-1;font-size:12px;color:#9fb5ab;min-height:16px}.authmsg.bad{color:#f0a79e}.authmsg.good{color:#87deb0}
+.hero{display:grid;grid-template-columns:1.55fr .85fr;gap:18px;margin-bottom:18px}.hero-main{padding:28px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold)}h2{margin:8px 0 10px;font-size:33px}p{color:#b9cbc2;line-height:1.6}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chip{padding:8px 10px;border-radius:999px;background:#0a1c16;border:1px solid #294b3d;color:#bfd3c9;font-size:12px}
+.summary{padding:22px}.summary h3{color:var(--gold2);font-size:16px}.summary dl{display:grid;grid-template-columns:1fr auto;gap:10px 16px;font-size:13px}.summary dt{color:#9eb3a9}.summary dd{margin:0}
+.grid{display:grid;grid-template-columns:290px 1fr 340px;gap:18px}.sidebar,.inspector{padding:18px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-title h3{margin:0;font-size:14px}.section-title span{font-size:11px;color:var(--muted)}
+.search{width:100%;background:#07140f;border:1px solid #244638;color:#eaf4ef;padding:11px 12px;border-radius:12px;outline:none;margin-bottom:14px}.layer{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:11px;color:#bdcfc6;font-size:13px}.layer input{accent-color:var(--gold)}
+.mapbox{min-height:580px;padding:16px}.map-surface{height:548px;border-radius:15px;background:radial-gradient(circle at 68% 42%,rgba(84,167,123,.35),transparent 8%),radial-gradient(circle at 61% 53%,rgba(216,180,81,.35),transparent 7%),linear-gradient(135deg,#1a2a23,#0c1713 65%,#17281f);position:relative;border:1px solid #244638;overflow:hidden}.map-surface:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.permit{position:absolute;left:26%;top:18%;width:44%;height:60%;border:3px solid var(--gold);clip-path:polygon(0 0,44% 0,44% 12%,58% 12%,58% 26%,70% 26%,70% 41%,82% 41%,82% 58%,100% 58%,100% 100%,38% 100%,38% 88%,23% 88%,23% 72%,11% 72%,11% 49%,0 49%);background:rgba(216,180,81,.05)}.marker{position:absolute;width:14px;height:14px;border-radius:50%;background:#d76455;border:2px solid white}.m1{left:49%;top:39%}.m2{left:55%;top:48%;background:#54a77b}.m3{left:45%;top:57%;background:#54a77b}.m4{left:60%;top:59%;background:#8fb7ff}.map-label{position:absolute;left:53%;top:32%;color:white;font-size:13px;background:rgba(0,0,0,.5);padding:6px 8px;border-radius:8px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{padding:14px;border-radius:14px;background:#0a1b15;border:1px solid #214334}.metric strong{display:block;color:var(--gold2);font-size:22px}.metric small{color:#93aaa0;font-size:11px}.source{padding:12px;border-radius:12px;background:#0a1b15;border:1px solid #234536;color:#adc2b8;font-size:12px;line-height:1.5}
+.table-card{margin-top:18px;padding:18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 10px;border-bottom:1px solid #173229;text-align:left}th{color:#9fb8ac}td{color:#d8e5df}.badge{padding:4px 8px;border-radius:999px;background:#173b2e;color:#ccebdd;font-size:10px}
+.page{display:none}.page.active{display:block}.simple{padding:26px}.simple h2{color:var(--gold2)}footer{text-align:center;color:#789288;font-size:11px;padding:20px}
+@media(max-width:1050px){.hero,.grid,.authbar{grid-template-columns:1fr}.authform{grid-template-columns:1fr 1fr}.brand{min-width:220px}nav{overflow:auto;justify-content:flex-start}}
+@media(max-width:700px){.topbar{flex-wrap:wrap}.brand{min-width:100%}.status{display:none}main{padding:12px}h2{font-size:26px}.authform{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="topbar">
+  <div class="brand"><div class="logo">Au</div><div><h1>Nsour Gold Explorer</h1><small>Cartographie & Analyse pour la Prospection Aurifère</small></div></div>
+  <nav><button class="active" data-page="home">Accueil</button><button data-page="map">Carte</button><button data-page="data">Données</button><button data-page="analysis">Analyses</button><button data-page="about">À propos</button></nav>
+  <div class="status" id="connectionStatus">● Neon : en attente</div>
+</div></header>
+
+<main>
+<section id="home" class="page active">
+  <div class="card authbar">
+    <div class="authinfo">
+      <h3>Connexion sécurisée Neon</h3>
+      <p>Connectez-vous avec Neon Auth. Le jeton d'authentification est ensuite utilisé par la Data API et les politiques RLS de PostgreSQL.</p>
+    </div>
+    <form class="authform" id="authForm">
+      <input id="email" type="email" placeholder="E-mail" required>
+      <input id="password" type="password" placeholder="Mot de passe" minlength="8" required>
+      <button class="btn primary" type="submit">Connexion</button>
+      <button class="btn secondary" type="button" id="signupBtn">Créer compte</button>
+      <div class="authmsg" id="authMsg">Aucun mot de passe de base de données n'est stocké dans cette page.</div>
+    </form>
+  </div>
+
+  <div class="hero">
+    <div class="card hero-main">
+      <div class="eyebrow">Permis Nsour · Nord de la Mauritanie</div>
+      <h2>Explorer les indices aurifères de Nsour à partir des données géologiques et analytiques.</h2>
+      <p>Tableau de bord associé au mémoire de Master sur la prospection et la caractérisation minéralogique des indices aurifères de la zone de Nsour. Mode <strong>Nsour uniquement</strong>.</p>
+      <div class="chips"><span class="chip">Géologie</span><span class="chip">Tranchées</span><span class="chip">Échantillons</span><span class="chip">RC</span><span class="chip">ALS Au-AA26</span><span class="chip">QA/QC</span></div>
+    </div>
+    <div class="card summary">
+      <h3>Résumé du permis</h3>
+      <dl><dt>Permis actuel</dt><dd id="permitCode">2919</dd><dt>Superficie</dt><dd id="permitArea">371 km²</dd><dt>CRS</dt><dd id="permitCrs">WGS84 / UTM 29N</dd><dt>Zone</dt><dd>Nsour</dd><dt>Minéralisation ciblée</dt><dd>Or</dd><dt>Statut</dt><dd>Exploration</dd></dl>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="card sidebar">
+      <div class="section-title"><h3>Couches</h3><span>Nsour</span></div>
+      <input class="search" placeholder="Rechercher un point ou un échantillon…">
+      <label class="layer"><input type="checkbox" checked> Limite du permis</label>
+      <label class="layer"><input type="checkbox" checked> Cible Nsour</label>
+      <label class="layer"><input type="checkbox" checked> Puits / Pit samples</label>
+      <label class="layer"><input type="checkbox" checked> Tranchées</label>
+      <label class="layer"><input type="checkbox" checked> Intervalles RC</label>
+      <div class="source"><b>Sources</b><br>Martinez (2014), Sahara Gold (2024), données de terrain et résultats ALS 2025.</div>
+    </aside>
+
+    <section class="card mapbox"><div class="map-surface"><div class="permit"></div><div class="marker m1"></div><div class="marker m2"></div><div class="marker m3"></div><div class="marker m4"></div><div class="map-label">Nsour · cible aurifère</div></div></section>
+
+    <aside class="card inspector">
+      <div class="section-title"><h3>Aperçu des données</h3><span id="dataState">non chargé</span></div>
+      <div class="metric-grid">
+        <div class="metric"><strong id="alsCount">—</strong><small>Résultats ALS</small></div>
+        <div class="metric"><strong id="qcCount">—</strong><small>QA/QC</small></div>
+        <div class="metric"><strong id="trenchCount">—</strong><small>Tranchées en base</small></div>
+        <div class="metric"><strong id="rcCount">—</strong><small>Intervalles RC</small></div>
+      </div>
+      <h3 style="margin-top:18px">Points clés</h3>
+      <p>Granite, granite-gneiss et unités mafiques ; cisaillements, fractures et veines de quartz–calcite ; signal aurifère historique documenté à Conchita.</p>
+      <div class="source">Les requêtes sont limitées au projet connecté et protégées par Neon Auth + RLS.</div>
+    </aside>
+  </div>
+
+  <section class="card table-card">
+    <div class="section-title"><h3>Jeux de données</h3><span id="userState">déconnecté</span></div>
+    <table><thead><tr><th>Jeu</th><th>Contenu</th><th>État</th></tr></thead><tbody>
+      <tr><td>explorer_trenches</td><td>Tranchées et suivi de campagne</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_pit_samples</td><td>Échantillons de puits / pits</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_rc_intercepts</td><td>Intervalles RC historiques</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_results</td><td>Résultats Au-AA26</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_qc</td><td>Blanks, duplicates, CRM</td><td><span class="badge">Neon</span></td></tr>
+    </tbody></table>
+  </section>
+</section>
+
+<section id="map" class="page"><div class="card simple"><h2>Carte</h2><p>La carte SIG détaillée sera reliée aux coordonnées de Nsour après validation de la connexion.</p></div></section>
+<section id="data" class="page"><div class="card simple"><h2>Données</h2><p>Les données réelles seront chargées depuis Neon après connexion.</p></div></section>
+<section id="analysis" class="page"><div class="card simple"><h2>Analyses</h2><p>Au-AA26, QA/QC, anomalies et statistiques seront ajoutés ici.</p></div></section>
+<section id="about" class="page"><div class="card simple"><h2>À propos</h2><p>Application associée au mémoire : « Prospection et caractérisation minéralogique des indices aurifères de la zone de Nsour au nord de la Mauritanie ».</p></div></section>
+<footer>Nsour Gold Explorer · Mémoire de Master · 2026</footer>
+</main>
+
+<script>
+document.querySelectorAll('nav button').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.page));
+}));
+</script>
+
+<script type="module">
+import { createAuthClient } from "https://esm.sh/@neondatabase/neon-js/auth?bundle";
+import { createClient } from "https://esm.sh/@neondatabase/neon-js?bundle";
+
+const DATA_API_URL = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+const AUTH_URL = "https://ep-noisy-shape-b6n7qbka.neonauth.c-7.us-east-2.aws.neon.tech/neondb/auth";
+
+const authClient = createAuthClient(AUTH_URL);
+
+const client = createClient({
+  dataApi: {
+    url: DATA_API_URL,
+    getToken: async () => await authClient.getJWTToken()
+  }
+});
+
+const $ = id => document.getElementById(id);
+const msg = (text, cls="") => {
+  $("authMsg").textContent = text;
+  $("authMsg").className = "authmsg " + cls;
+};
+
+async function getExactCount(table, column="*"){
+  const res = await client.from(table).select(column,{count:"exact",head:true});
+  if(res.error) throw res.error;
+  return res.count ?? 0;
+}
+
+async function loadData(){
+  try{
+    $("dataState").textContent = "chargement…";
+
+    const [als,qc,tr,rc,permit] = await Promise.all([
+      getExactCount("explorer_als_results","result_id"),
+      getExactCount("explorer_als_qc","qc_id"),
+      getExactCount("explorer_trenches","trench_record_id"),
+      getExactCount("explorer_rc_intercepts","intercept_id"),
+      client.from("explorer_permits")
+        .select("permit_key,current_code,current_area_km2,crs_epsg")
+        .eq("permit_key","NSOUR")
+        .maybeSingle()
+    ]);
+
+    $("alsCount").textContent = Number(als).toLocaleString("fr-FR");
+    $("qcCount").textContent = Number(qc).toLocaleString("fr-FR");
+    $("trenchCount").textContent = Number(tr).toLocaleString("fr-FR");
+    $("rcCount").textContent = Number(rc).toLocaleString("fr-FR");
+
+    if(!permit.error && permit.data){
+      $("permitCode").textContent = permit.data.current_code ?? "2919";
+      $("permitArea").textContent = (permit.data.current_area_km2 ?? 371) + " km²";
+      $("permitCrs").textContent = permit.data.crs_epsg
+        ? "EPSG:" + permit.data.crs_epsg
+        : "WGS84 / UTM 29N";
+    }
+
+    $("dataState").textContent = "données réelles";
+    $("connectionStatus").textContent = "● Neon : connecté";
+    msg("Connexion réussie. Les données affichées viennent de Neon.","good");
+
+  }catch(e){
+    $("dataState").textContent = "accès refusé / erreur";
+    $("connectionStatus").textContent = "● Neon : authentifié";
+    msg("Connexion réussie, mais l'accès aux données est refusé ou incomplet : " + (e?.message || e),"bad");
+  }
+}
+
+async function checkSession(){
+  try{
+    const r = await authClient.getSession();
+    const session = r?.data ?? r;
+    const user = session?.user ?? session?.session?.user ?? null;
+    if(user){
+      $("userState").textContent = user.email || "connecté";
+      await loadData();
+    }
+  }catch(e){}
+}
+checkSession();
+
+$("authForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  msg("Connexion…");
+
+  try{
+    const r = await authClient.signIn.email({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+
+    if(r?.error) throw r.error;
+
+    $("userState").textContent = $("email").value.trim();
+    await loadData();
+
+  }catch(e){
+    msg("Échec de connexion : " + (e?.message || e),"bad");
+  }
+});
+
+$("signupBtn").addEventListener("click", async ()=>{
+  const email = $("email").value.trim();
+  const password = $("password").value;
+
+  if(!email || password.length < 8){
+    msg("Entrez un e-mail valide et un mot de passe d'au moins 8 caractères.","bad");
+    return;
+  }
+
+  msg("Création du compte…");
+
+  try{
+    const r = await authClient.signUp.email({
+      email,
+      password,
+      name: email.split("@")[0]
+    });
+
+    if(r?.error) throw r.error;
+
+    msg("Compte créé. Vous pouvez maintenant vous connecter.","good");
+
+  }catch(e){
+    msg("Création impossible : " + (e?.message || e),"bad");
+  }
+});
+</script>
+</body>
+</html>
