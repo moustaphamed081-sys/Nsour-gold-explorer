@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nsour Gold Explorer</title>
+<style>
+:root{--bg:#07120f;--panel:#0d1b17;--panel2:#10231d;--line:#234638;--gold:#d8b451;--gold2:#f0d67a;--text:#f4f7f5;--muted:#9fb5ab;--green:#2f7d5b;--bad:#db7467}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07120f,#091711 45%,#06100d);color:var(--text);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(7,18,15,.94);border-bottom:1px solid rgba(216,180,81,.18)}
+.topbar{max-width:1400px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;min-width:290px}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#10231d;border:1px solid rgba(216,180,81,.35);color:var(--gold2);font-weight:700}
+.brand h1{margin:0;font-size:18px;color:var(--gold2)}.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+nav{display:flex;gap:6px;flex:1;justify-content:center}nav button{border:0;background:transparent;color:#b9c9c1;padding:10px 13px;border-radius:12px;cursor:pointer}nav button.active,nav button:hover{background:#12271f;color:var(--gold2)}
+.status{font-size:12px;color:#c9dfd4;background:#0d211a;border:1px solid #214536;padding:8px 11px;border-radius:999px}
+main{max-width:1400px;margin:auto;padding:20px}.card{background:linear-gradient(180deg,rgba(16,35,29,.96),rgba(10,24,19,.96));border:1px solid rgba(151,182,167,.14);border-radius:20px;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.authbar{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;padding:16px;margin-bottom:18px}.authinfo h3{margin:0 0 7px;color:var(--gold2)}.authinfo p{margin:0;color:#adc2b8;font-size:13px;line-height:1.55}
+.authform{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center}.authform input{min-width:0;background:#07140f;border:1px solid #244638;color:#fff;padding:10px 11px;border-radius:10px;outline:none}.btn{border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:600}.btn.primary{background:var(--gold);color:#142017}.btn.secondary{background:#163428;color:#d7e9e0}.btn.ghost{background:#0b1a15;color:#c5d7ce;border:1px solid #244638}
+.authmsg{grid-column:1/-1;font-size:12px;color:#9fb5ab;min-height:16px}.authmsg.bad{color:#f0a79e}.authmsg.good{color:#87deb0}
+.hero{display:grid;grid-template-columns:1.55fr .85fr;gap:18px;margin-bottom:18px}.hero-main{padding:28px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold)}h2{margin:8px 0 10px;font-size:33px}p{color:#b9cbc2;line-height:1.6}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chip{padding:8px 10px;border-radius:999px;background:#0a1c16;border:1px solid #294b3d;color:#bfd3c9;font-size:12px}
+.summary{padding:22px}.summary h3{color:var(--gold2);font-size:16px}.summary dl{display:grid;grid-template-columns:1fr auto;gap:10px 16px;font-size:13px}.summary dt{color:#9eb3a9}.summary dd{margin:0}
+.grid{display:grid;grid-template-columns:290px 1fr 340px;gap:18px}.sidebar,.inspector{padding:18px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-title h3{margin:0;font-size:14px}.section-title span{font-size:11px;color:var(--muted)}
+.search{width:100%;background:#07140f;border:1px solid #244638;color:#eaf4ef;padding:11px 12px;border-radius:12px;outline:none;margin-bottom:14px}.layer{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:11px;color:#bdcfc6;font-size:13px}.layer input{accent-color:var(--gold)}
+.mapbox{min-height:580px;padding:16px}.map-surface{height:548px;border-radius:15px;background:radial-gradient(circle at 68% 42%,rgba(84,167,123,.35),transparent 8%),radial-gradient(circle at 61% 53%,rgba(216,180,81,.35),transparent 7%),linear-gradient(135deg,#1a2a23,#0c1713 65%,#17281f);position:relative;border:1px solid #244638;overflow:hidden}.map-surface:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.permit{position:absolute;left:26%;top:18%;width:44%;height:60%;border:3px solid var(--gold);clip-path:polygon(0 0,44% 0,44% 12%,58% 12%,58% 26%,70% 26%,70% 41%,82% 41%,82% 58%,100% 58%,100% 100%,38% 100%,38% 88%,23% 88%,23% 72%,11% 72%,11% 49%,0 49%);background:rgba(216,180,81,.05)}.marker{position:absolute;width:14px;height:14px;border-radius:50%;background:#d76455;border:2px solid white}.m1{left:49%;top:39%}.m2{left:55%;top:48%;background:#54a77b}.m3{left:45%;top:57%;background:#54a77b}.m4{left:60%;top:59%;background:#8fb7ff}.map-label{position:absolute;left:53%;top:32%;color:white;font-size:13px;background:rgba(0,0,0,.5);padding:6px 8px;border-radius:8px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{padding:14px;border-radius:14px;background:#0a1b15;border:1px solid #214334}.metric strong{display:block;color:var(--gold2);font-size:22px}.metric small{color:#93aaa0;font-size:11px}.source{padding:12px;border-radius:12px;background:#0a1b15;border:1px solid #234536;color:#adc2b8;font-size:12px;line-height:1.5}
+.table-card{margin-top:18px;padding:18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 10px;border-bottom:1px solid #173229;text-align:left}th{color:#9fb8ac}td{color:#d8e5df}.badge{padding:4px 8px;border-radius:999px;background:#173b2e;color:#ccebdd;font-size:10px}
+.page{display:none}.page.active{display:block}.simple{padding:26px}.simple h2{color:var(--gold2)}footer{text-align:center;color:#789288;font-size:11px;padding:20px}
+@media(max-width:1050px){.hero,.grid,.authbar{grid-template-columns:1fr}.authform{grid-template-columns:1fr 1fr}.brand{min-width:220px}nav{overflow:auto;justify-content:flex-start}}
+@media(max-width:700px){.topbar{flex-wrap:wrap}.brand{min-width:100%}.status{display:none}main{padding:12px}h2{font-size:26px}.authform{grid-template-columns:1fr}}
+
+.data-page{padding:22px}
+.data-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}
+.data-head h2{margin:6px 0}
+.data-head p{max-width:760px;margin:0}
+.data-summary{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:8px;min-width:280px}
+.data-summary span{background:#0a1b15;border:1px solid #214334;border-radius:12px;padding:10px 12px;color:#a9beb4;font-size:12px}
+.data-summary b{display:block;color:var(--gold2);font-size:18px;margin-bottom:2px}
+.dataset-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.dataset-tab{border:1px solid #274b3d;background:#0a1b15;color:#bed2c8;border-radius:999px;padding:9px 13px;cursor:pointer;font-weight:600}
+.dataset-tab.active,.dataset-tab:hover{background:#173629;color:var(--gold2);border-color:#466f5d}
+.data-tools{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.data-tools .search{margin:0;max-width:520px}
+.dataset-meta{margin-left:auto;color:#91aa9f;font-size:12px}
+.data-table-wrap{overflow:auto;border:1px solid #1d3b30;border-radius:14px;background:#081510;max-height:570px}
+.data-table{min-width:900px}
+.data-table th{position:sticky;top:0;background:#10251d;z-index:1;color:var(--gold2);font-size:11px;letter-spacing:.02em}
+.data-table td{white-space:nowrap}
+.data-table tr:hover td{background:#0c1d17}
+.data-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#839c91;font-size:11px;padding-top:12px}
+.value-high{color:#f0d67a;font-weight:700}
+.value-bdl{color:#8da69b}
+.empty-row{text-align:center!important;color:#91aa9f!important;padding:28px!important}
+@media(max-width:800px){.data-head{flex-direction:column}.data-summary{width:100%;min-width:0}.data-tools{align-items:stretch;flex-direction:column}.data-tools .search{max-width:none}.dataset-meta{margin-left:0}}
+
+
+.page-size{background:#07140f;border:1px solid #244638;color:#eaf4ef;padding:10px 12px;border-radius:12px;outline:none}
+.pager{display:flex;justify-content:center;align-items:center;gap:14px;padding-top:14px}
+.pager-btn{border:1px solid #274b3d;background:#0a1b15;color:#d8e5df;border-radius:10px;padding:9px 14px;cursor:pointer}
+.pager-btn:hover:not(:disabled){background:#173629;color:var(--gold2)}
+.pager-btn:disabled{opacity:.4;cursor:not-allowed}
+#pageInfo{font-size:12px;color:#9fb5ab;min-width:110px;text-align:center}
+.loading-row{text-align:center!important;color:#9fb5ab!important;padding:32px!important}
+.error-row{text-align:center!important;color:#f0a79e!important;padding:32px!important}
+.data-table td,.data-table th{max-width:320px;overflow:hidden;text-overflow:ellipsis}
+
+</style>
+</head>
+<body>
+<header><div class="topbar">
+  <div class="brand"><div class="logo">Au</div><div><h1>Nsour Gold Explorer</h1><small>Cartographie & Analyse pour la Prospection Aurifère</small></div></div>
+  <nav><button class="active" data-page="home">Accueil</button><button data-page="map">Carte</button><button data-page="data">Données</button><button data-page="analysis">Analyses</button><button data-page="about">À propos</button></nav>
+  <div class="status" id="connectionStatus">● Mode lecture</div>
+</div></header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="card hero-main">
+      <div class="eyebrow">Permis Nsour · Nord de la Mauritanie</div>
+      <h2>Explorer les indices aurifères de Nsour à partir des données géologiques et analytiques.</h2>
+      <p>Tableau de bord associé au mémoire de Master sur la prospection et la caractérisation minéralogique des indices aurifères de la zone de Nsour. Mode <strong>Nsour uniquement</strong>.</p>
+      <div class="chips"><span class="chip">Géologie</span><span class="chip">Tranchées</span><span class="chip">Échantillons</span><span class="chip">RC</span><span class="chip">ALS Au-AA26</span><span class="chip">QA/QC</span></div>
+    </div>
+    <div class="card summary">
+      <h3>Résumé du permis</h3>
+      <dl><dt>Permis actuel</dt><dd id="permitCode">2919</dd><dt>Superficie</dt><dd id="permitArea">371 km²</dd><dt>CRS</dt><dd id="permitCrs">WGS84 / UTM 29N</dd><dt>Zone</dt><dd>Nsour</dd><dt>Minéralisation ciblée</dt><dd>Or</dd><dt>Statut</dt><dd>Exploration</dd></dl>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="card sidebar">
+      <div class="section-title"><h3>Couches</h3><span>Nsour</span></div>
+      <input class="search" placeholder="Rechercher un point ou un échantillon…">
+      <label class="layer"><input type="checkbox" checked> Limite du permis</label>
+      <label class="layer"><input type="checkbox" checked> Cible Nsour</label>
+      <label class="layer"><input type="checkbox" checked> Puits / Pit samples</label>
+      <label class="layer"><input type="checkbox" checked> Tranchées</label>
+      <label class="layer"><input type="checkbox" checked> Intervalles RC</label>
+      <div class="source"><b>Sources</b><br>Martinez (2014), Sahara Gold (2024), données de terrain et résultats ALS 2025.</div>
+    </aside>
+
+    <section class="card mapbox"><div class="map-surface"><div class="permit"></div><div class="marker m1"></div><div class="marker m2"></div><div class="marker m3"></div><div class="marker m4"></div><div class="map-label">Nsour · cible aurifère</div></div></section>
+
+    <aside class="card inspector">
+      <div class="section-title"><h3>Aperçu des données</h3><span id="dataState">base Nsour</span></div>
+      <div class="metric-grid">
+        <div class="metric"><strong id="alsCount">1 924</strong><small>Résultats ALS</small></div>
+        <div class="metric"><strong id="qcCount">137</strong><small>QA/QC</small></div>
+        <div class="metric"><strong id="trenchCount">44</strong><small>Tranchées en base</small></div>
+        <div class="metric"><strong id="rcCount">47</strong><small>Intervalles RC</small></div>
+      </div>
+      <h3 style="margin-top:18px">Points clés</h3>
+      <p>Granite, granite-gneiss et unités mafiques ; cisaillements, fractures et veines de quartz–calcite ; signal aurifère historique documenté à Conchita.</p>
+      <div class="source">Version de consultation rapide. Les données de référence Nsour sont affichées sans étape de connexion.</div>
+    </aside>
+  </div>
+
+  <section class="card table-card">
+    <div class="section-title"><h3>Jeux de données</h3><span id="userState">lecture</span></div>
+    <table><thead><tr><th>Jeu</th><th>Contenu</th><th>État</th></tr></thead><tbody>
+      <tr><td>explorer_trenches</td><td>Tranchées et suivi de campagne</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_pit_samples</td><td>Échantillons de puits / pits</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_rc_intercepts</td><td>Intervalles RC historiques</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_results</td><td>Résultats Au-AA26</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_qc</td><td>Blanks, duplicates, CRM</td><td><span class="badge">Neon</span></td></tr>
+    </tbody></table>
+  </section>
+</section>
+
+<section id="map" class="page"><div class="card simple"><h2>Carte</h2><p>La carte SIG détaillée sera reliée aux coordonnées de Nsour après validation de la connexion.</p></div></section>
+<section id="data" class="page">
+  <div class="card data-page">
+    <div class="data-head">
+      <div>
+        <div class="eyebrow">Base Nsour · lecture publique</div>
+        <h2>Données complètes</h2>
+        <p>Les tableaux ci-dessous chargent directement les enregistrements Nsour depuis Neon. Toutes les colonnes sont disponibles, avec recherche et pagination.</p>
+      </div>
+      <div class="data-summary">
+        <span><b id="sumAls">1 924</b> ALS</span>
+        <span><b id="sumQc">137</b> QA/QC</span>
+        <span><b id="sumTr">44</b> tranchées</span>
+        <span><b id="sumRc">47</b> RC</span>
+      </div>
+    </div>
+
+    <div class="dataset-tabs" id="datasetTabs">
+      <button class="dataset-tab active" data-dataset="als">ALS Au-AA26</button>
+      <button class="dataset-tab" data-dataset="qc">QA/QC</button>
+      <button class="dataset-tab" data-dataset="trenches">Tranchées</button>
+      <button class="dataset-tab" data-dataset="rc">Intervalles RC</button>
+    </div>
+
+    <div class="data-tools">
+      <input id="datasetSearch" class="search" placeholder="Rechercher dans toutes les colonnes…">
+      <select id="pageSize" class="page-size" aria-label="Nombre de lignes par page">
+        <option value="25">25 lignes</option>
+        <option value="50" selected>50 lignes</option>
+        <option value="100">100 lignes</option>
+        <option value="250">250 lignes</option>
+      </select>
+      <div id="datasetMeta" class="dataset-meta">Chargement…</div>
+    </div>
+
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead id="datasetHead"></thead>
+        <tbody id="datasetBody"></tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <button id="prevPage" class="pager-btn">← Précédent</button>
+      <span id="pageInfo">Page 1 / 1</span>
+      <button id="nextPage" class="pager-btn">Suivant →</button>
+    </div>
+
+    <div class="data-foot">
+      <span id="datasetStatus">Connexion à Neon…</span>
+      <span>Zone : Nsour uniquement · lecture seule</span>
+    </div>
+  </div>
+</section>
+<section id="analysis" class="page"><div class="card simple"><h2>Analyses</h2><p>Au-AA26, QA/QC, anomalies et statistiques seront ajoutés ici.</p></div></section>
+<section id="about" class="page"><div class="card simple"><h2>À propos</h2><p>Application associée au mémoire : « Prospection et caractérisation minéralogique des indices aurifères de la zone de Nsour au nord de la Mauritanie ».</p></div></section>
+<footer>Nsour Gold Explorer · Mémoire de Master · 2026</footer>
+</main>
+
+<script>
+document.querySelectorAll('nav button').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.page));
+}));
+</script>
+
+
+<script>
+(function(){
+  const API = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+  const CHUNK = 1000;
+
+  const configs = {
+    als:{
+      label:"ALS Au-AA26",
+      table:"explorer_als_results",
+      order:"result_id.asc",
+      columns:[
+        ["result_id","ID"],
+        ["permit_key","Permis"],
+        ["project_code","Projet"],
+        ["workorder","Workorder"],
+        ["po_number","PO"],
+        ["sample_id","Échantillon"],
+        ["sample_group","Groupe"],
+        ["pass75um_pct","Pass 75 µm (%)"],
+        ["au_reported_text","Au rapporté (ppm)"],
+        ["au_value_or_limit_ppm","Au / limite (ppm)"],
+        ["qualifier","Qualificatif"],
+        ["below_detection","Sous LOD"],
+        ["method","Méthode"],
+        ["source_id","Source"]
+      ]
+    },
+    qc:{
+      label:"QA/QC",
+      table:"explorer_als_qc",
+      order:"qc_id.asc",
+      columns:[
+        ["qc_id","ID"],
+        ["permit_key","Permis"],
+        ["project_code","Projet"],
+        ["workorder","Workorder"],
+        ["po_number","PO"],
+        ["control_name","Contrôle"],
+        ["au_reported_text","Au rapporté (ppm)"],
+        ["au_value_or_limit_ppm","Au / limite (ppm)"],
+        ["qualifier","Qualificatif"],
+        ["source_id","Source"]
+      ]
+    },
+    trenches:{
+      label:"Tranchées",
+      table:"explorer_trenches",
+      order:"trench_id.asc",
+      columns:[
+        ["permit_key","Permis"],
+        ["trench_id","Tranchée"],
+        ["drillhole_name","Nom terrain"],
+        ["easting_m","Easting"],
+        ["northing_m","Northing"],
+        ["elevation_m","Altitude (m)"],
+        ["azimuth_deg","Azimut (°)"],
+        ["dip_deg","Pendage (°)"],
+        ["target_length_m","Long. cible (m)"],
+        ["actual_length_m","Long. réelle (m)"],
+        ["status","Statut"],
+        ["campaign","Campagne"],
+        ["source_id","Source"],
+        ["notes","Notes"]
+      ]
+    },
+    rc:{
+      label:"Intervalles RC",
+      table:"explorer_rc_intercepts",
+      order:"intercept_id.asc",
+      columns:[
+        ["intercept_id","ID"],
+        ["permit_key","Permis"],
+        ["zone_name","Zone"],
+        ["hole_id","Forage"],
+        ["from_m","De (m)"],
+        ["to_m","À (m)"],
+        ["thickness_source_text","Épaisseur source"],
+        ["thickness_calc_m","Épaisseur calculée (m)"],
+        ["au_grade_ppm","Au (g/t)"],
+        ["data_quality_note","Note qualité"],
+        ["source_id","Source"]
+      ]
+    }
+  };
+
+  const state = {
+    current:"als",
+    rows:[],
+    filtered:[],
+    page:1,
+    pageSize:50,
+    loaded:{}
+  };
+
+  const el = id => document.getElementById(id);
+
+  function esc(v){
+    return String(v ?? "—").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function displayValue(v){
+    if(v === null || v === undefined || v === "") return "—";
+    if(typeof v === "boolean") return v ? "Oui" : "Non";
+    return v;
+  }
+
+  function setTableMessage(text, cls="loading-row"){
+    const cfg = configs[state.current];
+    el("datasetHead").innerHTML = "<tr>" + cfg.columns.map(c => "<th>"+esc(c[1])+"</th>").join("") + "</tr>";
+    el("datasetBody").innerHTML = '<tr><td class="'+cls+'" colspan="'+cfg.columns.length+'">'+esc(text)+'</td></tr>';
+  }
+
+  function applyFilter(resetPage=true){
+    const term = (el("datasetSearch")?.value || "").trim().toLowerCase();
+    state.filtered = term
+      ? state.rows.filter(row => Object.values(row).some(v => String(v ?? "").toLowerCase().includes(term)))
+      : state.rows.slice();
+    if(resetPage) state.page = 1;
+    render();
+  }
+
+  function render(){
+    const cfg = configs[state.current];
+    const total = state.filtered.length;
+    const pages = Math.max(1, Math.ceil(total / state.pageSize));
+    if(state.page > pages) state.page = pages;
+
+    const start = (state.page - 1) * state.pageSize;
+    const pageRows = state.filtered.slice(start, start + state.pageSize);
+
+    el("datasetHead").innerHTML = "<tr>" + cfg.columns.map(c => "<th>"+esc(c[1])+"</th>").join("") + "</tr>";
+
+    if(!pageRows.length){
+      el("datasetBody").innerHTML = '<tr><td class="empty-row" colspan="'+cfg.columns.length+'">Aucun résultat.</td></tr>';
+    } else {
+      el("datasetBody").innerHTML = pageRows.map(row => "<tr>" + cfg.columns.map(([key]) => {
+        const raw = row[key];
+        let cls = "";
+        if((key === "au_grade_ppm" || key === "au_value_or_limit_ppm") && Number(raw) >= 1) cls = "value-high";
+        if(key === "au_reported_text" && String(raw ?? "").startsWith("<")) cls = "value-bdl";
+        return '<td class="'+cls+'" title="'+esc(displayValue(raw))+'">'+esc(displayValue(raw))+'</td>';
+      }).join("") + "</tr>").join("");
+    }
+
+    const from = total ? start + 1 : 0;
+    const to = Math.min(start + state.pageSize, total);
+    el("datasetMeta").textContent = cfg.label + " · " + total.toLocaleString("fr-FR") + " ligne(s) · affichage " + from + "–" + to;
+    el("pageInfo").textContent = "Page " + state.page + " / " + pages;
+    el("prevPage").disabled = state.page <= 1;
+    el("nextPage").disabled = state.page >= pages;
+  }
+
+  async function fetchAll(cfg){
+    const all = [];
+    let offset = 0;
+
+    while(true){
+      const params = new URLSearchParams();
+      params.set("select","*");
+      params.set("permit_key","eq.NSOUR");
+      params.set("order",cfg.order);
+      params.set("limit",String(CHUNK));
+      params.set("offset",String(offset));
+
+      const res = await fetch(API + "/" + cfg.table + "?" + params.toString(), {
+        headers:{"Accept":"application/json"}
+      });
+
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const batch = await res.json();
+      if(!Array.isArray(batch)) throw new Error("Réponse inattendue");
+
+      all.push(...batch);
+      if(batch.length < CHUNK) break;
+      offset += CHUNK;
+    }
+    return all;
+  }
+
+  function updateSummary(dataset,count){
+    const ids = {als:"sumAls",qc:"sumQc",trenches:"sumTr",rc:"sumRc"};
+    const target = el(ids[dataset]);
+    if(target) target.textContent = Number(count).toLocaleString("fr-FR");
+  }
+
+  async function load(dataset){
+    state.current = dataset;
+    state.page = 1;
+    el("datasetSearch").value = "";
+    el("datasetStatus").textContent = "Chargement des données complètes depuis Neon…";
+    setTableMessage("Chargement…");
+
+    try{
+      if(!state.loaded[dataset]){
+        const rows = await fetchAll(configs[dataset]);
+        state.loaded[dataset] = rows;
+      }
+      state.rows = state.loaded[dataset];
+      state.filtered = state.rows.slice();
+      updateSummary(dataset,state.rows.length);
+      el("datasetStatus").textContent = "Données complètes chargées depuis Neon · lecture seule.";
+      el("connectionStatus").textContent = "● Neon : lecture publique";
+      render();
+    }catch(err){
+      state.rows = [];
+      state.filtered = [];
+      setTableMessage(
+        "Lecture Neon refusée (" + (err?.message || err) + "). Exécutez d'abord le script enable_public_read_nsour.sql dans Neon.",
+        "error-row"
+      );
+      el("datasetMeta").textContent = configs[dataset].label + " · non chargé";
+      el("datasetStatus").textContent = "La politique RLS publique n'est pas encore active.";
+    }
+  }
+
+  document.querySelectorAll(".dataset-tab").forEach(btn => btn.addEventListener("click",()=>{
+    document.querySelectorAll(".dataset-tab").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    load(btn.dataset.dataset);
+  }));
+
+  el("datasetSearch")?.addEventListener("input",()=>applyFilter(true));
+  el("pageSize")?.addEventListener("change",()=>{
+    state.pageSize = Number(el("pageSize").value) || 50;
+    state.page = 1;
+    render();
+  });
+  el("prevPage")?.addEventListener("click",()=>{
+    if(state.page > 1){ state.page--; render(); }
+  });
+  el("nextPage")?.addEventListener("click",()=>{
+    const pages = Math.max(1,Math.ceil(state.filtered.length/state.pageSize));
+    if(state.page < pages){ state.page++; render(); }
+  });
+
+  document.querySelector('nav button[data-page="data"]')?.addEventListener("click",()=>{
+    if(!state.loaded[state.current]) load(state.current);
+  });
+
+  setTableMessage("Cliquez sur Données pour charger les tableaux complets.");
+})();
+</script>
+
+<script type="module">
+const DATA_API_URL = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+
+const $ = id => document.getElementById(id);
+
+async function exactCount(table){
+  const res = await fetch(`${DATA_API_URL}/${table}?select=*&limit=1`, {
+    headers: {
+      "Accept": "application/json",
+      "Prefer": "count=exact"
+    }
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const range = res.headers.get("content-range") || "";
+  const m = range.match(/\/(\d+)$/);
+  return m ? Number(m[1]) : null;
+}
+
+async function loadPublicData(){
+  try{
+    const [als,qc,tr,rc] = await Promise.all([
+      exactCount("explorer_als_results"),
+      exactCount("explorer_als_qc"),
+      exactCount("explorer_trenches"),
+      exactCount("explorer_rc_intercepts")
+    ]);
+
+    if(Number.isFinite(als)) $("alsCount").textContent = als.toLocaleString("fr-FR");
+    if(Number.isFinite(qc)) $("qcCount").textContent = qc.toLocaleString("fr-FR");
+    if(Number.isFinite(tr)) $("trenchCount").textContent = tr.toLocaleString("fr-FR");
+    if(Number.isFinite(rc)) $("rcCount").textContent = rc.toLocaleString("fr-FR");
+
+    $("dataState").textContent = "données Neon";
+    $("connectionStatus").textContent = "● Neon : lecture";
+  }catch(e){
+    // Keep the verified reference totals already shown in the page.
+    $("dataState").textContent = "référentiel Nsour";
+    $("connectionStatus").textContent = "● Mode lecture";
+  }
+}
+
+loadPublicData();
+</script>
+</body>
+</html>
