@@ -161,7 +161,7 @@ main{max-width:1400px;margin:auto;padding:20px}.card{background:linear-gradient(
       <div>
         <div class="eyebrow">Permis 2919 · WGS84 / UTM 29N</div>
         <h2>Carte SIG de Nsour</h2>
-        <p>Limite officielle du permis à partir des 28 sommets UTM du programme Sahara Gold 2024, avec chargement des tranchées géoréférencées depuis la base Nsour.</p>
+        <p>Limite officielle du permis à partir des 28 sommets UTM du programme Sahara Gold 2024, avec affichage des tranchées géoréférencées de Nsour.</p>
       </div>
       <div class="map-status" id="mapStatus">Carte prête · ouverture en cours…</div>
     </div>
@@ -621,8 +621,67 @@ loadPublicData();
     }[m]));
   }
 
+  const FALLBACK_TRENCHES = [{"permit_key": "NSOUR", "trench_id": "CNTR001", "drillhole_name": "PLTR016", "easting_m": 536251, "northing_m": 2895445, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 280, "actual_length_m": 300, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR002", "drillhole_name": "PLTR019", "easting_m": 535754, "northing_m": 2895386, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR003", "drillhole_name": "PLTR020", "easting_m": 535590, "northing_m": 2895291, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR004", "drillhole_name": "PLTR030", "easting_m": 535405, "northing_m": 2895184, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR005", "drillhole_name": "PLTR028", "easting_m": 535221, "northing_m": 2895442, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 75, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR006", "drillhole_name": "PLTR032", "easting_m": 535377, "northing_m": 2895532, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR007", "drillhole_name": "PLTR022", "easting_m": 535592, "northing_m": 2895656, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR008", "drillhole_name": "PLTR025", "easting_m": 535438, "northing_m": 2895931, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR009", "drillhole_name": "PLTR034", "easting_m": 535284, "northing_m": 2895842, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 60 m; foré 75 m dans la source."}, {"permit_key": "NSOUR", "trench_id": "CNTR010", "drillhole_name": "PLTR026", "easting_m": 535128, "northing_m": 2895752, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 75, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR011", "drillhole_name": "PLTR069", "easting_m": 534998, "northing_m": 2896586, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR012", "drillhole_name": "PLTR072", "easting_m": 534835, "northing_m": 2896856, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR013", "drillhole_name": "PLTR045", "easting_m": 534539, "northing_m": 2896913, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": 100, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR014", "drillhole_name": "PLTR048", "easting_m": 534481, "northing_m": 2897243, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 130, "actual_length_m": 130, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR015", "drillhole_name": "PLTR051", "easting_m": 534390, "northing_m": 2897554, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 90, "actual_length_m": 100, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 90 m; foré 100 m dans la source."}, {"permit_key": "NSOUR", "trench_id": "CNTR016", "drillhole_name": "PLTR054", "easting_m": 534360, "northing_m": 2898447, "elevation_m": 421, "azimuth_deg": 245, "dip_deg": 0, "target_length_m": 150, "actual_length_m": 150, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR017", "drillhole_name": "PLTR073", "easting_m": 535135, "northing_m": 2897621, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR018", "drillhole_name": "PLTR075", "easting_m": 535598, "northing_m": 2897160, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR019", "drillhole_name": "PLTR060", "easting_m": 536171, "northing_m": 2896809, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 70, "actual_length_m": 70, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR020", "drillhole_name": "PLTR058", "easting_m": 536259, "northing_m": 2896405, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR021", "drillhole_name": "PLTR063", "easting_m": 536385, "northing_m": 2895670, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 180, "actual_length_m": 180, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR022", "drillhole_name": "MPTR014", "easting_m": 536924, "northing_m": 2895379, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 800, "actual_length_m": 810, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 800 m; foré 810 m."}, {"permit_key": "NSOUR", "trench_id": "CNTR023", "drillhole_name": "MPTR006", "easting_m": 536308, "northing_m": 2896081, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 700, "actual_length_m": 700, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR024", "drillhole_name": "MPTR010", "easting_m": 534299, "northing_m": 2898874, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 350, "actual_length_m": 350, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "La correspondance CNTR024 diffère du daily report du 02/01; conservée par source."}, {"permit_key": "NSOUR", "trench_id": "CNTR025", "drillhole_name": "MPTR002", "easting_m": 534360, "northing_m": 2898448, "elevation_m": 421, "azimuth_deg": 60, "dip_deg": 0, "target_length_m": 220, "actual_length_m": 220, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "La correspondance CNTR025 diffère du daily report du 02/01; conservée par source."}, {"permit_key": "NSOUR", "trench_id": "CNTR020", "drillhole_name": "PLTR058", "easting_m": 536259.0, "northing_m": 2896405, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 50, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR019", "drillhole_name": "PLTR060", "easting_m": 536171.0, "northing_m": 2896809, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 70, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR021", "drillhole_name": "PLTR063", "easting_m": 536385.0, "northing_m": 2895670, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 180, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR022", "drillhole_name": "MPTR014", "easting_m": 536924.7438, "northing_m": 2895379.123, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 800, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR023", "drillhole_name": "MPTR006", "easting_m": 536308, "northing_m": 2896081, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 700, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR024", "drillhole_name": "MPTR020", "easting_m": 535499.516, "northing_m": 2896558.089, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 230, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": "Correspondance de nom différente du rapport Sahara Gold 2024."}, {"permit_key": "NSOUR", "trench_id": "CNTR025", "drillhole_name": "MPTR021", "easting_m": 535538.6748, "northing_m": 2896853.615, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 450, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": "Correspondance de nom différente du rapport Sahara Gold 2024."}, {"permit_key": "NSOUR", "trench_id": "CNTR026", "drillhole_name": "MPTR025", "easting_m": 535300.0149, "northing_m": 2897034.229, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 80, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR027", "drillhole_name": "MPTR015", "easting_m": 535072.7771, "northing_m": 2897039.492, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 100, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR028", "drillhole_name": "MPTR007", "easting_m": 534908.6074, "northing_m": 2897490.544, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 280, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR029", "drillhole_name": "MPTR005", "easting_m": 534799.1609, "northing_m": 2897791.246, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 280, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR030", "drillhole_name": "MPTR001", "easting_m": 534361, "northing_m": 2898448, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 150, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR031", "drillhole_name": "MPTR002", "easting_m": 534361, "northing_m": 2898448, "elevation_m": 0, "azimuth_deg": 60, "dip_deg": null, "target_length_m": 220, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR032", "drillhole_name": "MPTR010", "easting_m": 534299.5641, "northing_m": 2898874.41, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 400, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-01", "drillhole_name": "TP1", "easting_m": 534347, "northing_m": 2898383, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 150, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": "Le texte dit 380 m proposés, mais les longueurs listées totalisent 680 m."}, {"permit_key": "NSOUR", "trench_id": "TP-02", "drillhole_name": "TP2", "easting_m": 534720, "northing_m": 2897921, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 150, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-03", "drillhole_name": "TP3", "easting_m": 534989, "northing_m": 2897355, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 180, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-04", "drillhole_name": "TP4", "easting_m": 535257, "northing_m": 2897018, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-05", "drillhole_name": "TP5", "easting_m": 536268, "northing_m": 2895821, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}];
+
   async function loadTrenches(){
     const status = document.getElementById("mapStatus");
+
+    function drawRows(rows, sourceLabel){
+      trenchMarkers = [];
+      trenchLayer.clearLayers();
+
+      rows.forEach(row=>{
+        const e = Number(row.easting_m), n = Number(row.northing_m);
+        if(!Number.isFinite(e) || !Number.isFinite(n)) return;
+
+        const [lat,lon] = utmToLatLon(e,n,29,true);
+        const statusKey = String(row.status || "").toLowerCase();
+
+        let fill = "#d8b451";
+        if(statusKey === "completed") fill = "#54a77b";
+        if(statusKey === "planned") fill = "#8fb7ff";
+        if(statusKey === "proposed") fill = "#e0a25d";
+
+        const marker = L.circleMarker([lat,lon],{
+          radius:6,
+          weight:2,
+          color:"#f4f7f5",
+          fillColor:fill,
+          fillOpacity:.92
+        });
+
+        const name = row.trench_id || row.drillhole_name || "Tranchée";
+        marker._nsourSearch = String(name + " " + (row.drillhole_name || "")).toLowerCase();
+
+        marker.bindPopup(`
+          <div class="nsour-popup">
+            <b>${esc(name)}</b>
+            <table>
+              <tr><td>Nom terrain</td><td>${esc(row.drillhole_name)}</td></tr>
+              <tr><td>Easting</td><td>${esc(row.easting_m)} m</td></tr>
+              <tr><td>Northing</td><td>${esc(row.northing_m)} m</td></tr>
+              <tr><td>Longueur cible</td><td>${esc(row.target_length_m)} m</td></tr>
+              <tr><td>Longueur réelle</td><td>${esc(row.actual_length_m)} m</td></tr>
+              <tr><td>Azimut</td><td>${esc(row.azimuth_deg)}°</td></tr>
+              <tr><td>Pendage</td><td>${esc(row.dip_deg)}°</td></tr>
+              <tr><td>Statut</td><td>${esc(row.status)}</td></tr>
+              <tr><td>Campagne</td><td>${esc(row.campaign)}</td></tr>
+              <tr><td>Source</td><td>${esc(sourceLabel)}</td></tr>
+            </table>
+          </div>
+        `);
+
+        marker.addTo(trenchLayer);
+        trenchMarkers.push(marker);
+      });
+
+      document.getElementById("mapTrenchCount").textContent =
+        trenchMarkers.length.toLocaleString("fr-FR");
+
+      status.textContent =
+        `Carte active · ${trenchMarkers.length} tranchée(s) cartographiée(s) · ${sourceLabel}`;
+    }
+
     try{
       const params = new URLSearchParams();
       params.set("select","trench_id,drillhole_name,easting_m,northing_m,elevation_m,azimuth_deg,dip_deg,target_length_m,actual_length_m,status,campaign,notes");
@@ -632,49 +691,22 @@ loadPublicData();
       const res = await fetch(API + "/explorer_trenches?" + params.toString(), {
         headers:{"Accept":"application/json"}
       });
+
       if(!res.ok) throw new Error("HTTP " + res.status);
 
       const rows = await res.json();
       if(!Array.isArray(rows)) throw new Error("Réponse inattendue");
 
-      trenchMarkers = [];
-      trenchLayer.clearLayers();
+      const valid = rows.filter(r =>
+        Number.isFinite(Number(r.easting_m)) &&
+        Number.isFinite(Number(r.northing_m))
+      );
 
-      rows.forEach(row=>{
-        const e = Number(row.easting_m), n = Number(row.northing_m);
-        if(!Number.isFinite(e) || !Number.isFinite(n)) return;
-        const [lat,lon] = utmToLatLon(e,n,29,true);
+      if(!valid.length) throw new Error("Aucune tranchée géoréférencée retournée");
 
-        const marker = L.circleMarker([lat,lon],{
-          radius:6,weight:2,color:"#f4f7f5",fillColor:"#d8b451",fillOpacity:.9
-        });
-
-        const name = row.trench_id || row.drillhole_name || "Tranchée";
-        marker._nsourSearch = String(name).toLowerCase();
-        marker.bindPopup(`
-          <div class="nsour-popup">
-            <b>${esc(name)}</b>
-            <table>
-              <tr><td>Easting</td><td>${esc(row.easting_m)} m</td></tr>
-              <tr><td>Northing</td><td>${esc(row.northing_m)} m</td></tr>
-              <tr><td>Longueur cible</td><td>${esc(row.target_length_m)} m</td></tr>
-              <tr><td>Longueur réelle</td><td>${esc(row.actual_length_m)} m</td></tr>
-              <tr><td>Azimut</td><td>${esc(row.azimuth_deg)}°</td></tr>
-              <tr><td>Pendage</td><td>${esc(row.dip_deg)}°</td></tr>
-              <tr><td>Statut</td><td>${esc(row.status)}</td></tr>
-              <tr><td>Campagne</td><td>${esc(row.campaign)}</td></tr>
-            </table>
-          </div>
-        `);
-        marker.addTo(trenchLayer);
-        trenchMarkers.push(marker);
-      });
-
-      document.getElementById("mapTrenchCount").textContent = trenchMarkers.length.toLocaleString("fr-FR");
-      status.textContent = `Carte active · ${trenchMarkers.length} tranchée(s) géoréférencée(s)`;
+      drawRows(valid, "Neon");
     }catch(err){
-      status.textContent = "Carte active · tranchées non chargées";
-      document.getElementById("mapTrenchCount").textContent = "—";
+      drawRows(FALLBACK_TRENCHES, "référentiel Nsour intégré");
     }
   }
 
