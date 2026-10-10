@@ -1,0 +1,1162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nsour Gold Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<style>
+:root{--bg:#07120f;--panel:#0d1b17;--panel2:#10231d;--line:#234638;--gold:#d8b451;--gold2:#f0d67a;--text:#f4f7f5;--muted:#9fb5ab;--green:#2f7d5b;--bad:#db7467}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07120f,#091711 45%,#06100d);color:var(--text);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(7,18,15,.94);border-bottom:1px solid rgba(216,180,81,.18)}
+.topbar{max-width:1400px;margin:auto;padding:14px 20px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;min-width:290px}.logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:#10231d;border:1px solid rgba(216,180,81,.35);color:var(--gold2);font-weight:700}
+.brand h1{margin:0;font-size:18px;color:var(--gold2)}.brand small{display:block;color:var(--muted);margin-top:3px;font-size:11px}
+nav{display:flex;gap:6px;flex:1;justify-content:center}nav button{border:0;background:transparent;color:#b9c9c1;padding:10px 13px;border-radius:12px;cursor:pointer}nav button.active,nav button:hover{background:#12271f;color:var(--gold2)}
+.status{font-size:12px;color:#c9dfd4;background:#0d211a;border:1px solid #214536;padding:8px 11px;border-radius:999px}
+main{max-width:1400px;margin:auto;padding:20px}.card{background:linear-gradient(180deg,rgba(16,35,29,.96),rgba(10,24,19,.96));border:1px solid rgba(151,182,167,.14);border-radius:20px;box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.authbar{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;padding:16px;margin-bottom:18px}.authinfo h3{margin:0 0 7px;color:var(--gold2)}.authinfo p{margin:0;color:#adc2b8;font-size:13px;line-height:1.55}
+.authform{display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center}.authform input{min-width:0;background:#07140f;border:1px solid #244638;color:#fff;padding:10px 11px;border-radius:10px;outline:none}.btn{border:0;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:600}.btn.primary{background:var(--gold);color:#142017}.btn.secondary{background:#163428;color:#d7e9e0}.btn.ghost{background:#0b1a15;color:#c5d7ce;border:1px solid #244638}
+.authmsg{grid-column:1/-1;font-size:12px;color:#9fb5ab;min-height:16px}.authmsg.bad{color:#f0a79e}.authmsg.good{color:#87deb0}
+.hero{display:grid;grid-template-columns:1.55fr .85fr;gap:18px;margin-bottom:18px}.hero-main{padding:28px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--gold)}h2{margin:8px 0 10px;font-size:33px}p{color:#b9cbc2;line-height:1.6}.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.chip{padding:8px 10px;border-radius:999px;background:#0a1c16;border:1px solid #294b3d;color:#bfd3c9;font-size:12px}
+.summary{padding:22px}.summary h3{color:var(--gold2);font-size:16px}.summary dl{display:grid;grid-template-columns:1fr auto;gap:10px 16px;font-size:13px}.summary dt{color:#9eb3a9}.summary dd{margin:0}
+.grid{display:grid;grid-template-columns:290px 1fr 340px;gap:18px}.sidebar,.inspector{padding:18px}.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.section-title h3{margin:0;font-size:14px}.section-title span{font-size:11px;color:var(--muted)}
+.search{width:100%;background:#07140f;border:1px solid #244638;color:#eaf4ef;padding:11px 12px;border-radius:12px;outline:none;margin-bottom:14px}.layer{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:11px;color:#bdcfc6;font-size:13px}.layer input{accent-color:var(--gold)}
+.mapbox{min-height:580px;padding:16px}.map-surface{height:548px;border-radius:15px;background:radial-gradient(circle at 68% 42%,rgba(84,167,123,.35),transparent 8%),radial-gradient(circle at 61% 53%,rgba(216,180,81,.35),transparent 7%),linear-gradient(135deg,#1a2a23,#0c1713 65%,#17281f);position:relative;border:1px solid #244638;overflow:hidden}.map-surface:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:40px 40px}
+.permit{position:absolute;left:26%;top:18%;width:44%;height:60%;border:3px solid var(--gold);clip-path:polygon(0 0,44% 0,44% 12%,58% 12%,58% 26%,70% 26%,70% 41%,82% 41%,82% 58%,100% 58%,100% 100%,38% 100%,38% 88%,23% 88%,23% 72%,11% 72%,11% 49%,0 49%);background:rgba(216,180,81,.05)}.marker{position:absolute;width:14px;height:14px;border-radius:50%;background:#d76455;border:2px solid white}.m1{left:49%;top:39%}.m2{left:55%;top:48%;background:#54a77b}.m3{left:45%;top:57%;background:#54a77b}.m4{left:60%;top:59%;background:#8fb7ff}.map-label{position:absolute;left:53%;top:32%;color:white;font-size:13px;background:rgba(0,0,0,.5);padding:6px 8px;border-radius:8px}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.metric{padding:14px;border-radius:14px;background:#0a1b15;border:1px solid #214334}.metric strong{display:block;color:var(--gold2);font-size:22px}.metric small{color:#93aaa0;font-size:11px}.source{padding:12px;border-radius:12px;background:#0a1b15;border:1px solid #234536;color:#adc2b8;font-size:12px;line-height:1.5}
+.table-card{margin-top:18px;padding:18px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:11px 10px;border-bottom:1px solid #173229;text-align:left}th{color:#9fb8ac}td{color:#d8e5df}.badge{padding:4px 8px;border-radius:999px;background:#173b2e;color:#ccebdd;font-size:10px}
+.page{display:none}.page.active{display:block}.simple{padding:26px}.simple h2{color:var(--gold2)}footer{text-align:center;color:#789288;font-size:11px;padding:20px}
+@media(max-width:1050px){.hero,.grid,.authbar{grid-template-columns:1fr}.authform{grid-template-columns:1fr 1fr}.brand{min-width:220px}nav{overflow:auto;justify-content:flex-start}}
+@media(max-width:700px){.topbar{flex-wrap:wrap}.brand{min-width:100%}.status{display:none}main{padding:12px}h2{font-size:26px}.authform{grid-template-columns:1fr}}
+
+.data-page{padding:22px}
+.data-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:18px}
+.data-head h2{margin:6px 0}
+.data-head p{max-width:760px;margin:0}
+.data-summary{display:grid;grid-template-columns:repeat(2,minmax(110px,1fr));gap:8px;min-width:280px}
+.data-summary span{background:#0a1b15;border:1px solid #214334;border-radius:12px;padding:10px 12px;color:#a9beb4;font-size:12px}
+.data-summary b{display:block;color:var(--gold2);font-size:18px;margin-bottom:2px}
+.dataset-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 14px}
+.dataset-tab{border:1px solid #274b3d;background:#0a1b15;color:#bed2c8;border-radius:999px;padding:9px 13px;cursor:pointer;font-weight:600}
+.dataset-tab.active,.dataset-tab:hover{background:#173629;color:var(--gold2);border-color:#466f5d}
+.data-tools{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.data-tools .search{margin:0;max-width:520px}
+.dataset-meta{margin-left:auto;color:#91aa9f;font-size:12px}
+.data-table-wrap{overflow:auto;border:1px solid #1d3b30;border-radius:14px;background:#081510;max-height:570px}
+.data-table{min-width:900px}
+.data-table th{position:sticky;top:0;background:#10251d;z-index:1;color:var(--gold2);font-size:11px;letter-spacing:.02em}
+.data-table td{white-space:nowrap}
+.data-table tr:hover td{background:#0c1d17}
+.data-foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#839c91;font-size:11px;padding-top:12px}
+.value-high{color:#f0d67a;font-weight:700}
+.value-bdl{color:#8da69b}
+.empty-row{text-align:center!important;color:#91aa9f!important;padding:28px!important}
+@media(max-width:800px){.data-head{flex-direction:column}.data-summary{width:100%;min-width:0}.data-tools{align-items:stretch;flex-direction:column}.data-tools .search{max-width:none}.dataset-meta{margin-left:0}}
+
+
+.page-size{background:#07140f;border:1px solid #244638;color:#eaf4ef;padding:10px 12px;border-radius:12px;outline:none}
+.pager{display:flex;justify-content:center;align-items:center;gap:14px;padding-top:14px}
+.pager-btn{border:1px solid #274b3d;background:#0a1b15;color:#d8e5df;border-radius:10px;padding:9px 14px;cursor:pointer}
+.pager-btn:hover:not(:disabled){background:#173629;color:var(--gold2)}
+.pager-btn:disabled{opacity:.4;cursor:not-allowed}
+#pageInfo{font-size:12px;color:#9fb5ab;min-width:110px;text-align:center}
+.loading-row{text-align:center!important;color:#9fb5ab!important;padding:32px!important}
+.error-row{text-align:center!important;color:#f0a79e!important;padding:32px!important}
+.data-table td,.data-table th{max-width:320px;overflow:hidden;text-overflow:ellipsis}
+
+
+/* --- Carte SIG Nsour --- */
+.map-page{padding:18px}
+.map-page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;margin-bottom:14px}
+.map-page-head h2{margin:6px 0}.map-page-head p{margin:0;max-width:760px}
+.map-status{font-size:12px;color:#bcd0c6;background:#0a1b15;border:1px solid #214334;padding:9px 12px;border-radius:999px;white-space:nowrap}
+.map-layout{display:grid;grid-template-columns:270px 1fr;gap:14px}
+.map-controls{padding:16px}
+.map-controls h3{margin:0 0 10px;color:var(--gold2);font-size:14px}
+.map-controls .search{margin-bottom:10px}
+.map-control-note{font-size:11px;color:#849c91;line-height:1.5;margin:8px 0 14px}
+.map-check{display:flex;gap:9px;align-items:center;padding:9px 5px;color:#c5d6ce;font-size:13px}
+.map-check input{accent-color:var(--gold)}
+.map-check.disabled{opacity:.48}
+.map-mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.map-mini{background:#081510;border:1px solid #1f4033;border-radius:12px;padding:10px}
+.map-mini b{display:block;color:var(--gold2);font-size:17px}.map-mini span{font-size:10px;color:#8fa79c}
+#nsourMap{height:650px;border-radius:15px;overflow:hidden;border:1px solid #244638;background:#0b1713}
+.leaflet-container{font-family:Segoe UI,Arial,sans-serif;background:#0b1713}
+.leaflet-control-layers,.leaflet-bar a{background:#10231d!important;color:#e7f1ec!important;border-color:#2b5142!important}
+.leaflet-control-layers{color:#dce9e3!important}
+.nsour-popup{min-width:210px}.nsour-popup b{color:#7b5a00}.nsour-popup table{font-size:11px}.nsour-popup td{padding:3px 0;border:0;color:#24372f}.nsour-popup td:first-child{padding-right:10px;color:#6c7d75}
+.map-coordinate{margin-top:12px;padding:10px;border-radius:10px;background:#081510;border:1px solid #1d3b30;color:#9fb5ab;font-size:11px;line-height:1.5}
+@media(max-width:900px){.map-layout{grid-template-columns:1fr}.map-page-head{flex-direction:column}.map-status{white-space:normal}#nsourMap{height:560px}}
+
+
+.map-legend{margin-top:12px;font-size:11px;color:#9fb5ab;line-height:1.7}
+.map-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 5px 0 2px;vertical-align:-1px}
+
+
+.rc-btn{width:100%;margin-top:10px;border:1px solid #315d4a;background:#0b1c16;color:#dbe9e2;border-radius:10px;padding:10px 12px;text-align:left;cursor:pointer}
+.rc-btn:hover{border-color:#d8b451;color:#fff}
+.rc-panel{display:none;position:fixed;z-index:99999;top:80px;right:24px;width:min(520px,calc(100% - 36px));max-height:calc(100% - 36px);overflow:auto;background:#0d1d17;border:1px solid #315d4a;border-radius:16px;box-shadow:0 18px 55px rgba(0,0,0,.45);padding:16px;color:#dce9e3}
+.rc-panel.open{display:block}
+.rc-panel h3{margin:0 32px 6px 0;color:#f0d67a}
+.rc-panel p{margin:0 0 12px;color:#9eb3a8;font-size:12px;line-height:1.5}
+.rc-close{position:absolute;top:10px;right:12px;border:0;background:transparent;color:#dce9e3;font-size:24px;cursor:pointer}
+.rc-result{border:1px solid #27493b;background:#081510;border-radius:12px;padding:10px;margin:8px 0}
+.rc-result summary{cursor:pointer;color:#f4f7f5;font-weight:700}
+.rc-result table{width:100%;font-size:11px;margin-top:8px;border-collapse:collapse}
+.rc-result td,.rc-result th{padding:5px 4px;border-bottom:1px solid #1b372d;text-align:left}
+.rc-result th{color:#d8b451}
+.rc-badge{display:inline-block;margin-left:6px;padding:2px 6px;border-radius:999px;background:#1a342a;color:#bdd3c8;font-size:10px}
+
+
+@media(max-width:700px){
+  .rc-panel{
+    top:70px;
+    left:12px;
+    right:12px;
+    width:auto;
+    max-height:calc(100vh - 90px);
+  }
+}
+
+.rc-result table{display:table!important}
+.rc-result td,.rc-result th{color:#dce9e3!important}
+.rc-result th{color:#f0d67a!important}
+.rc-result{overflow-x:auto}
+
+
+#rcResults{display:block!important;visibility:visible!important;opacity:1!important}
+#rcResults .rc-result{display:block!important;visibility:visible!important;opacity:1!important}
+#rcResults .rc-result div{visibility:visible!important;opacity:1!important}
+
+</style>
+</head>
+<body>
+<header><div class="topbar">
+  <div class="brand"><div class="logo">Au</div><div><h1>Nsour Gold Explorer</h1><small>Cartographie & Analyse pour la Prospection Aurifère</small></div></div>
+  <nav><button class="active" data-page="home">Accueil</button><button data-page="map">Carte</button><button data-page="data">Données</button><button data-page="analysis">Analyses</button><button data-page="about">À propos</button></nav>
+  <div class="status" id="connectionStatus">● Mode lecture</div>
+</div></header>
+
+<main>
+<section id="home" class="page active">
+  <div class="hero">
+    <div class="card hero-main">
+      <div class="eyebrow">Permis Nsour · Nord de la Mauritanie</div>
+      <h2>Explorer les indices aurifères de Nsour à partir des données géologiques et analytiques.</h2>
+      <p>Tableau de bord associé au mémoire de Master sur la prospection et la caractérisation minéralogique des indices aurifères de la zone de Nsour. Mode <strong>Nsour uniquement</strong>.</p>
+      <div class="chips"><span class="chip">Géologie</span><span class="chip">Tranchées</span><span class="chip">Échantillons</span><span class="chip">RC</span><span class="chip">ALS Au-AA26</span><span class="chip">QA/QC</span></div>
+    </div>
+    <div class="card summary">
+      <h3>Résumé du permis</h3>
+      <dl><dt>Permis actuel</dt><dd id="permitCode">2919</dd><dt>Superficie</dt><dd id="permitArea">371 km²</dd><dt>CRS</dt><dd id="permitCrs">WGS84 / UTM 29N</dd><dt>Zone</dt><dd>Nsour</dd><dt>Minéralisation ciblée</dt><dd>Or</dd><dt>Statut</dt><dd>Exploration</dd></dl>
+    </div>
+  </div>
+
+  <div class="grid">
+    <aside class="card sidebar">
+      <div class="section-title"><h3>Couches</h3><span>Nsour</span></div>
+      <input class="search" placeholder="Rechercher un point ou un échantillon…">
+      <label class="layer"><input type="checkbox" checked> Limite du permis</label>
+      <label class="layer"><input type="checkbox" checked> Cible Nsour</label>
+      <label class="layer"><input type="checkbox" checked> Puits / Pit samples</label>
+      <label class="layer"><input type="checkbox" checked> Tranchées</label>
+      <label class="layer"><input type="checkbox" checked> Intervalles RC</label>
+      <div class="source"><b>Sources</b><br>Martinez (2014), Sahara Gold (2024), données de terrain et résultats ALS 2025.</div>
+    </aside>
+
+    <section class="card mapbox"><div class="map-surface"><div class="permit"></div><div class="marker m1"></div><div class="marker m2"></div><div class="marker m3"></div><div class="marker m4"></div><div class="map-label">Nsour · cible aurifère</div></div></section>
+
+    <aside class="card inspector">
+      <div class="section-title"><h3>Aperçu des données</h3><span id="dataState">base Nsour</span></div>
+      <div class="metric-grid">
+        <div class="metric"><strong id="alsCount">1 924</strong><small>Résultats ALS</small></div>
+        <div class="metric"><strong id="qcCount">137</strong><small>QA/QC</small></div>
+        <div class="metric"><strong id="trenchCount">44</strong><small>Tranchées en base</small></div>
+        <div class="metric"><strong id="rcCount">47</strong><small>Intervalles RC</small></div>
+      </div>
+      <h3 style="margin-top:18px">Points clés</h3>
+      <p>Granite, granite-gneiss et unités mafiques ; cisaillements, fractures et veines de quartz–calcite ; signal aurifère historique documenté à Conchita.</p>
+      <div class="source">Version de consultation rapide. Les données de référence Nsour sont affichées sans étape de connexion.</div>
+    </aside>
+  </div>
+
+  <section class="card table-card">
+    <div class="section-title"><h3>Jeux de données</h3><span id="userState">lecture</span></div>
+    <table><thead><tr><th>Jeu</th><th>Contenu</th><th>État</th></tr></thead><tbody>
+      <tr><td>explorer_trenches</td><td>Tranchées et suivi de campagne</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_pit_samples</td><td>Échantillons de puits / pits</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_rc_intercepts</td><td>Intervalles RC historiques</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_results</td><td>Résultats Au-AA26</td><td><span class="badge">Neon</span></td></tr>
+      <tr><td>explorer_als_qc</td><td>Blanks, duplicates, CRM</td><td><span class="badge">Neon</span></td></tr>
+    </tbody></table>
+  </section>
+</section>
+
+
+<section id="map" class="page">
+  <div class="card map-page">
+    <div class="map-page-head">
+      <div>
+        <div class="eyebrow">Permis 2919 · WGS84 / UTM 29N</div>
+        <h2>Carte SIG de Nsour</h2>
+        <p>Limite officielle du permis à partir des 28 sommets UTM du programme Sahara Gold 2024, avec affichage des tranchées géoréférencées de Nsour.</p>
+      </div>
+      <div class="map-status" id="mapStatus">Carte prête · ouverture en cours…</div>
+    </div>
+
+    <div class="map-layout">
+      <aside class="card map-controls">
+        <h3>Recherche & couches</h3>
+        <input id="mapSearch" class="search" placeholder="Rechercher CNTR, Pit ou GH…">
+        <select id="auFilter" class="search" style="margin-top:8px">
+          <option value="all">Au GH — toutes les valeurs</option>
+          <option value="low">Au &lt; 0,10 ppm</option>
+          <option value="medium">Au 0,10–0,49 ppm</option>
+          <option value="high">Au ≥ 0,50 ppm</option>
+        </select>
+        <label class="map-check"><input id="togglePermit" type="checkbox" checked> Limite du permis</label>
+        <label class="map-check"><input id="toggleTrenches" type="checkbox" checked> Tranchées</label>
+        <label class="map-check"><input id="togglePits" type="checkbox" checked> Puits / échantillons</label>
+        <label class="map-check"><input id="toggleAu" type="checkbox" checked> Résultats Au — échantillons GH</label>
+        <button id="openRcPanel" class="rc-btn">RC Conchita — consulter les résultats historiques</button>
+        <div class="map-control-note">Cliquez sur une tranchée, un puits ou un résultat Au pour afficher les informations disponibles. Les points Au des échantillons GH utilisent le point de référence de leur tranchée lorsque l’échantillon ne possède pas de coordonnées propres.</div>
+
+        <div class="map-mini-grid">
+          <div class="map-mini"><b>2919</b><span>Permis</span></div>
+          <div class="map-mini"><b>371 km²</b><span>Superficie</span></div>
+          <div class="map-mini"><b id="mapTrenchCount">—</b><span>Tranchées cartographiées</span></div>
+          <div class="map-mini"><b id="mapPitCount">—</b><span>Puits cartographiés</span></div>
+          <div class="map-mini"><b id="mapAuCount">—</b><span>Tranchées avec Au GH</span></div>
+          <div class="map-mini"><b id="mapAuMax">—</b><span>Au max GH (ppm)</span></div>
+        </div>
+
+        <div class="map-legend">
+<i style="background:#54a77b"></i>Tranchée terminée &nbsp;
+<i style="background:#8fb7ff"></i>Planifiée &nbsp;
+<i style="background:#e0a25d"></i>Proposée<br>
+<i style="background:#d86bd4"></i>Puits / échantillons<br>
+<i style="background:#c7d95b"></i>Au &lt; 0,10 ppm &nbsp; <i style="background:#ffb347"></i>0,10–0,49 ppm &nbsp; <i style="background:#ff5f57"></i>≥ 0,50 ppm
+</div>
+        <div class="map-coordinate" id="mapCoordinate">
+          Coordonnées : déplacez le pointeur sur la carte.<br>
+          Référence : WGS84 / UTM zone 29N.
+        </div>
+      </aside>
+
+
+      <div id="rcPanel" class="rc-panel">
+        <button id="closeRcPanel" class="rc-close" aria-label="Fermer">×</button>
+        <h3>RC Conchita — données historiques</h3>
+        <p>Les teneurs et intervalles sont disponibles, mais les coordonnées des collets RC ne sont pas présentes dans le jeu de données actuel. Ils ne sont donc pas placés sur la carte afin d’éviter toute localisation approximative. <b>Les numéros absents ne sont pas inventés : seuls les forages pour lesquels une donnée RC détaillée est disponible sont affichés.</b></p>
+        <div style="display:flex;gap:8px;align-items:center"><input id="rcSearch" class="search" style="flex:1;margin:0" placeholder="Ex. 11NSRC025"><button id="rcSearchBtn" class="rc-btn" style="width:auto;margin:0;white-space:nowrap">Afficher</button></div>
+        <div id="rcSearchStatus" class="map-coordinate" style="margin-top:8px">Tapez un numéro de forage puis cliquez sur <b>Afficher</b>.</div><div id="rcSummary" class="map-coordinate" style="margin-top:8px"></div>
+        <div id="rcResults"></div>
+      </div>
+
+      <div id="nsourMap" aria-label="Carte interactive du permis Nsour"></div>
+    </div>
+  </div>
+</section>
+
+<section id="data" class="page">
+  <div class="card data-page">
+    <div class="data-head">
+      <div>
+        <div class="eyebrow">Base Nsour · lecture publique</div>
+        <h2>Données complètes</h2>
+        <p>Les tableaux ci-dessous chargent directement les enregistrements Nsour depuis Neon. Toutes les colonnes sont disponibles, avec recherche et pagination.</p>
+      </div>
+      <div class="data-summary">
+        <span><b id="sumAls">1 924</b> ALS</span>
+        <span><b id="sumQc">137</b> QA/QC</span>
+        <span><b id="sumTr">44</b> tranchées</span>
+        <span><b id="sumRc">47</b> RC</span>
+      </div>
+    </div>
+
+    <div class="dataset-tabs" id="datasetTabs">
+      <button class="dataset-tab active" data-dataset="als">ALS Au-AA26</button>
+      <button class="dataset-tab" data-dataset="qc">QA/QC</button>
+      <button class="dataset-tab" data-dataset="trenches">Tranchées</button>
+      <button class="dataset-tab" data-dataset="rc">Intervalles RC</button>
+    </div>
+
+    <div class="data-tools">
+      <input id="datasetSearch" class="search" placeholder="Rechercher dans toutes les colonnes…">
+      <select id="pageSize" class="page-size" aria-label="Nombre de lignes par page">
+        <option value="25">25 lignes</option>
+        <option value="50" selected>50 lignes</option>
+        <option value="100">100 lignes</option>
+        <option value="250">250 lignes</option>
+      </select>
+      <div id="datasetMeta" class="dataset-meta">Chargement…</div>
+    </div>
+
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead id="datasetHead"></thead>
+        <tbody id="datasetBody"></tbody>
+      </table>
+    </div>
+
+    <div class="pager">
+      <button id="prevPage" class="pager-btn">← Précédent</button>
+      <span id="pageInfo">Page 1 / 1</span>
+      <button id="nextPage" class="pager-btn">Suivant →</button>
+    </div>
+
+    <div class="data-foot">
+      <span id="datasetStatus">Connexion à Neon…</span>
+      <span>Zone : Nsour uniquement · lecture seule</span>
+    </div>
+  </div>
+</section>
+<section id="analysis" class="page"><div class="card simple"><h2>Analyses</h2><p>Au-AA26, QA/QC, anomalies et statistiques seront ajoutés ici.</p></div></section>
+<section id="about" class="page"><div class="card simple"><h2>À propos</h2><p>Application associée au mémoire : « Prospection et caractérisation minéralogique des indices aurifères de la zone de Nsour au nord de la Mauritanie ».</p></div></section>
+<footer>Nsour Gold Explorer · Mémoire de Master · 2026</footer>
+</main>
+
+<script>
+document.querySelectorAll('nav button').forEach(btn=>btn.addEventListener('click',()=>{
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+ document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===btn.dataset.page));
+}));
+</script>
+
+
+<script>
+(function(){
+  const API = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+  const CHUNK = 1000;
+
+  const configs = {
+    als:{
+      label:"ALS Au-AA26",
+      table:"explorer_als_results",
+      order:"result_id.asc",
+      columns:[
+        ["result_id","ID"],
+        ["permit_key","Permis"],
+        ["project_code","Projet"],
+        ["workorder","Workorder"],
+        ["po_number","PO"],
+        ["sample_id","Échantillon"],
+        ["sample_group","Groupe"],
+        ["pass75um_pct","Pass 75 µm (%)"],
+        ["au_reported_text","Au rapporté (ppm)"],
+        ["au_value_or_limit_ppm","Au / limite (ppm)"],
+        ["qualifier","Qualificatif"],
+        ["below_detection","Sous LOD"],
+        ["method","Méthode"],
+        ["source_id","Source"]
+      ]
+    },
+    qc:{
+      label:"QA/QC",
+      table:"explorer_als_qc",
+      order:"qc_id.asc",
+      columns:[
+        ["qc_id","ID"],
+        ["permit_key","Permis"],
+        ["project_code","Projet"],
+        ["workorder","Workorder"],
+        ["po_number","PO"],
+        ["control_name","Contrôle"],
+        ["au_reported_text","Au rapporté (ppm)"],
+        ["au_value_or_limit_ppm","Au / limite (ppm)"],
+        ["qualifier","Qualificatif"],
+        ["source_id","Source"]
+      ]
+    },
+    trenches:{
+      label:"Tranchées",
+      table:"explorer_trenches",
+      order:"trench_id.asc",
+      columns:[
+        ["permit_key","Permis"],
+        ["trench_id","Tranchée"],
+        ["drillhole_name","Nom terrain"],
+        ["easting_m","Easting"],
+        ["northing_m","Northing"],
+        ["elevation_m","Altitude (m)"],
+        ["azimuth_deg","Azimut (°)"],
+        ["dip_deg","Pendage (°)"],
+        ["target_length_m","Long. cible (m)"],
+        ["actual_length_m","Long. réelle (m)"],
+        ["status","Statut"],
+        ["campaign","Campagne"],
+        ["source_id","Source"],
+        ["notes","Notes"]
+      ]
+    },
+    rc:{
+      label:"Intervalles RC",
+      table:"explorer_rc_intercepts",
+      order:"intercept_id.asc",
+      columns:[
+        ["intercept_id","ID"],
+        ["permit_key","Permis"],
+        ["zone_name","Zone"],
+        ["hole_id","Forage"],
+        ["from_m","De (m)"],
+        ["to_m","À (m)"],
+        ["thickness_source_text","Épaisseur source"],
+        ["thickness_calc_m","Épaisseur calculée (m)"],
+        ["au_grade_ppm","Au (g/t)"],
+        ["data_quality_note","Note qualité"],
+        ["source_id","Source"]
+      ]
+    }
+  };
+
+  const state = {
+    current:"als",
+    rows:[],
+    filtered:[],
+    page:1,
+    pageSize:50,
+    loaded:{}
+  };
+
+  const el = id => document.getElementById(id);
+
+  function esc(v){
+    return String(v ?? "—").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  function displayValue(v){
+    if(v === null || v === undefined || v === "") return "—";
+    if(typeof v === "boolean") return v ? "Oui" : "Non";
+    return v;
+  }
+
+  function setTableMessage(text, cls="loading-row"){
+    const cfg = configs[state.current];
+    el("datasetHead").innerHTML = "<tr>" + cfg.columns.map(c => "<th>"+esc(c[1])+"</th>").join("") + "</tr>";
+    el("datasetBody").innerHTML = '<tr><td class="'+cls+'" colspan="'+cfg.columns.length+'">'+esc(text)+'</td></tr>';
+  }
+
+  function applyFilter(resetPage=true){
+    const term = (el("datasetSearch")?.value || "").trim().toLowerCase();
+    state.filtered = term
+      ? state.rows.filter(row => Object.values(row).some(v => String(v ?? "").toLowerCase().includes(term)))
+      : state.rows.slice();
+    if(resetPage) state.page = 1;
+    render();
+  }
+
+  function render(){
+    const cfg = configs[state.current];
+    const total = state.filtered.length;
+    const pages = Math.max(1, Math.ceil(total / state.pageSize));
+    if(state.page > pages) state.page = pages;
+
+    const start = (state.page - 1) * state.pageSize;
+    const pageRows = state.filtered.slice(start, start + state.pageSize);
+
+    el("datasetHead").innerHTML = "<tr>" + cfg.columns.map(c => "<th>"+esc(c[1])+"</th>").join("") + "</tr>";
+
+    if(!pageRows.length){
+      el("datasetBody").innerHTML = '<tr><td class="empty-row" colspan="'+cfg.columns.length+'">Aucun résultat.</td></tr>';
+    } else {
+      el("datasetBody").innerHTML = pageRows.map(row => "<tr>" + cfg.columns.map(([key]) => {
+        const raw = row[key];
+        let cls = "";
+        if((key === "au_grade_ppm" || key === "au_value_or_limit_ppm") && Number(raw) >= 1) cls = "value-high";
+        if(key === "au_reported_text" && String(raw ?? "").startsWith("<")) cls = "value-bdl";
+        return '<td class="'+cls+'" title="'+esc(displayValue(raw))+'">'+esc(displayValue(raw))+'</td>';
+      }).join("") + "</tr>").join("");
+    }
+
+    const from = total ? start + 1 : 0;
+    const to = Math.min(start + state.pageSize, total);
+    el("datasetMeta").textContent = cfg.label + " · " + total.toLocaleString("fr-FR") + " ligne(s) · affichage " + from + "–" + to;
+    el("pageInfo").textContent = "Page " + state.page + " / " + pages;
+    el("prevPage").disabled = state.page <= 1;
+    el("nextPage").disabled = state.page >= pages;
+  }
+
+  async function fetchAll(cfg){
+    const all = [];
+    let offset = 0;
+
+    while(true){
+      const params = new URLSearchParams();
+      params.set("select","*");
+      params.set("permit_key","eq.NSOUR");
+      params.set("order",cfg.order);
+      params.set("limit",String(CHUNK));
+      params.set("offset",String(offset));
+
+      const res = await fetch(API + "/" + cfg.table + "?" + params.toString(), {
+        headers:{"Accept":"application/json"}
+      });
+
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const batch = await res.json();
+      if(!Array.isArray(batch)) throw new Error("Réponse inattendue");
+
+      all.push(...batch);
+      if(batch.length < CHUNK) break;
+      offset += CHUNK;
+    }
+    return all;
+  }
+
+  function updateSummary(dataset,count){
+    const ids = {als:"sumAls",qc:"sumQc",trenches:"sumTr",rc:"sumRc"};
+    const target = el(ids[dataset]);
+    if(target) target.textContent = Number(count).toLocaleString("fr-FR");
+  }
+
+  async function load(dataset){
+    state.current = dataset;
+    state.page = 1;
+    el("datasetSearch").value = "";
+    el("datasetStatus").textContent = "Chargement des données complètes depuis Neon…";
+    setTableMessage("Chargement…");
+
+    try{
+      if(!state.loaded[dataset]){
+        const rows = await fetchAll(configs[dataset]);
+        state.loaded[dataset] = rows;
+      }
+      state.rows = state.loaded[dataset];
+      state.filtered = state.rows.slice();
+      updateSummary(dataset,state.rows.length);
+      el("datasetStatus").textContent = "Données complètes chargées depuis Neon · lecture seule.";
+      el("connectionStatus").textContent = "● Neon : lecture publique";
+      render();
+    }catch(err){
+      state.rows = [];
+      state.filtered = [];
+      setTableMessage(
+        "Lecture Neon refusée (" + (err?.message || err) + "). Exécutez d'abord le script enable_public_read_nsour.sql dans Neon.",
+        "error-row"
+      );
+      el("datasetMeta").textContent = configs[dataset].label + " · non chargé";
+      el("datasetStatus").textContent = "La politique RLS publique n'est pas encore active.";
+    }
+  }
+
+  document.querySelectorAll(".dataset-tab").forEach(btn => btn.addEventListener("click",()=>{
+    document.querySelectorAll(".dataset-tab").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    load(btn.dataset.dataset);
+  }));
+
+  el("datasetSearch")?.addEventListener("input",()=>applyFilter(true));
+  el("pageSize")?.addEventListener("change",()=>{
+    state.pageSize = Number(el("pageSize").value) || 50;
+    state.page = 1;
+    render();
+  });
+  el("prevPage")?.addEventListener("click",()=>{
+    if(state.page > 1){ state.page--; render(); }
+  });
+  el("nextPage")?.addEventListener("click",()=>{
+    const pages = Math.max(1,Math.ceil(state.filtered.length/state.pageSize));
+    if(state.page < pages){ state.page++; render(); }
+  });
+
+  document.querySelector('nav button[data-page="data"]')?.addEventListener("click",()=>{
+    if(!state.loaded[state.current]) load(state.current);
+  });
+
+  setTableMessage("Cliquez sur Données pour charger les tableaux complets.");
+})();
+</script>
+
+<script type="module">
+const DATA_API_URL = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+
+const $ = id => document.getElementById(id);
+
+async function exactCount(table){
+  const res = await fetch(`${DATA_API_URL}/${table}?select=*&limit=1`, {
+    headers: {
+      "Accept": "application/json",
+      "Prefer": "count=exact"
+    }
+  });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const range = res.headers.get("content-range") || "";
+  const m = range.match(/\/(\d+)$/);
+  return m ? Number(m[1]) : null;
+}
+
+async function loadPublicData(){
+  try{
+    const [als,qc,tr,rc] = await Promise.all([
+      exactCount("explorer_als_results"),
+      exactCount("explorer_als_qc"),
+      exactCount("explorer_trenches"),
+      exactCount("explorer_rc_intercepts")
+    ]);
+
+    if(Number.isFinite(als)) $("alsCount").textContent = als.toLocaleString("fr-FR");
+    if(Number.isFinite(qc)) $("qcCount").textContent = qc.toLocaleString("fr-FR");
+    if(Number.isFinite(tr)) $("trenchCount").textContent = tr.toLocaleString("fr-FR");
+    if(Number.isFinite(rc)) $("rcCount").textContent = rc.toLocaleString("fr-FR");
+
+    $("dataState").textContent = "données Neon";
+    $("connectionStatus").textContent = "● Neon : lecture";
+  }catch(e){
+    // Keep the verified reference totals already shown in the page.
+    $("dataState").textContent = "référentiel Nsour";
+    $("connectionStatus").textContent = "● Mode lecture";
+  }
+}
+
+loadPublicData();
+</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<script>
+(function(){
+  const API = "https://ep-noisy-shape-b6n7qbka.apirest.c-7.us-east-2.aws.neon.tech/neondb/rest/v1";
+
+  const permitUTM = [
+    [534000,2900000],[540000,2900000],[540000,2897000],[542000,2897000],
+    [542000,2895000],[546000,2895000],[546000,2891000],[550000,2891000],
+    [550000,2885000],[552000,2885000],[552000,2883000],[555000,2883000],
+    [555000,2878000],[558000,2878000],[558000,2856000],[553000,2856000],
+    [553000,2868000],[551000,2868000],[551000,2871000],[549000,2871000],
+    [549000,2875000],[546000,2875000],[546000,2882000],[543000,2882000],
+    [543000,2887000],[538000,2887000],[538000,2891000],[534000,2891000]
+  ];
+
+  let map = null;
+  let permitLayer = null;
+  let trenchLayer = null;
+  let trenchMarkers = [];
+  let pitLayer = null;
+  let pitMarkers = [];
+  let auLayer = null;
+  let auMarkers = [];
+  let initialized = false;
+
+  function utmToLatLon(easting, northing, zoneNumber=29, northern=true){
+    const a = 6378137.0;
+    const eccSquared = 0.00669438;
+    const k0 = 0.9996;
+
+    const x = Number(easting) - 500000.0;
+    let y = Number(northing);
+    if(!northern) y -= 10000000.0;
+
+    const longOrigin = (zoneNumber - 1) * 6 - 180 + 3;
+    const eccPrimeSquared = eccSquared / (1 - eccSquared);
+    const M = y / k0;
+    const mu = M / (a * (1 - eccSquared/4 - 3*eccSquared*eccSquared/64 - 5*Math.pow(eccSquared,3)/256));
+
+    const e1 = (1 - Math.sqrt(1-eccSquared)) / (1 + Math.sqrt(1-eccSquared));
+    const J1 = 3*e1/2 - 27*Math.pow(e1,3)/32;
+    const J2 = 21*e1*e1/16 - 55*Math.pow(e1,4)/32;
+    const J3 = 151*Math.pow(e1,3)/96;
+    const J4 = 1097*Math.pow(e1,4)/512;
+
+    const fp = mu + J1*Math.sin(2*mu) + J2*Math.sin(4*mu) + J3*Math.sin(6*mu) + J4*Math.sin(8*mu);
+    const sinfp = Math.sin(fp), cosfp = Math.cos(fp), tanfp = Math.tan(fp);
+
+    const C1 = eccPrimeSquared * cosfp*cosfp;
+    const T1 = tanfp*tanfp;
+    const N1 = a / Math.sqrt(1 - eccSquared*sinfp*sinfp);
+    const R1 = a*(1-eccSquared) / Math.pow(1-eccSquared*sinfp*sinfp, 1.5);
+    const D = x / (N1*k0);
+
+    const lat = fp - (N1*tanfp/R1) * (
+      D*D/2 -
+      (5 + 3*T1 + 10*C1 - 4*C1*C1 - 9*eccPrimeSquared)*Math.pow(D,4)/24 +
+      (61 + 90*T1 + 298*C1 + 45*T1*T1 - 252*eccPrimeSquared - 3*C1*C1)*Math.pow(D,6)/720
+    );
+
+    const lon = (
+      D -
+      (1 + 2*T1 + C1)*Math.pow(D,3)/6 +
+      (5 - 2*C1 + 28*T1 - 3*C1*C1 + 8*eccPrimeSquared + 24*T1*T1)*Math.pow(D,5)/120
+    ) / cosfp;
+
+    return [lat * 180/Math.PI, longOrigin + lon * 180/Math.PI];
+  }
+
+  function esc(v){
+    return String(v ?? "—").replace(/[&<>"']/g, m => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+    }[m]));
+  }
+
+  const FALLBACK_TRENCHES = [{"permit_key": "NSOUR", "trench_id": "CNTR001", "drillhole_name": "PLTR016", "easting_m": 536251, "northing_m": 2895445, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 280, "actual_length_m": 300, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR002", "drillhole_name": "PLTR019", "easting_m": 535754, "northing_m": 2895386, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR003", "drillhole_name": "PLTR020", "easting_m": 535590, "northing_m": 2895291, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR004", "drillhole_name": "PLTR030", "easting_m": 535405, "northing_m": 2895184, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR005", "drillhole_name": "PLTR028", "easting_m": 535221, "northing_m": 2895442, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 75, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR006", "drillhole_name": "PLTR032", "easting_m": 535377, "northing_m": 2895532, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR007", "drillhole_name": "PLTR022", "easting_m": 535592, "northing_m": 2895656, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR008", "drillhole_name": "PLTR025", "easting_m": 535438, "northing_m": 2895931, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 60, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR009", "drillhole_name": "PLTR034", "easting_m": 535284, "northing_m": 2895842, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 60, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 60 m; foré 75 m dans la source."}, {"permit_key": "NSOUR", "trench_id": "CNTR010", "drillhole_name": "PLTR026", "easting_m": 535128, "northing_m": 2895752, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 75, "actual_length_m": 75, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR011", "drillhole_name": "PLTR069", "easting_m": 534998, "northing_m": 2896586, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR012", "drillhole_name": "PLTR072", "easting_m": 534835, "northing_m": 2896856, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR013", "drillhole_name": "PLTR045", "easting_m": 534539, "northing_m": 2896913, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": 100, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR014", "drillhole_name": "PLTR048", "easting_m": 534481, "northing_m": 2897243, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 130, "actual_length_m": 130, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR015", "drillhole_name": "PLTR051", "easting_m": 534390, "northing_m": 2897554, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 90, "actual_length_m": 100, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 90 m; foré 100 m dans la source."}, {"permit_key": "NSOUR", "trench_id": "CNTR016", "drillhole_name": "PLTR054", "easting_m": 534360, "northing_m": 2898447, "elevation_m": 421, "azimuth_deg": 245, "dip_deg": 0, "target_length_m": 150, "actual_length_m": 150, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR017", "drillhole_name": "PLTR073", "easting_m": 535135, "northing_m": 2897621, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR018", "drillhole_name": "PLTR075", "easting_m": 535598, "northing_m": 2897160, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR019", "drillhole_name": "PLTR060", "easting_m": 536171, "northing_m": 2896809, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 70, "actual_length_m": 70, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR020", "drillhole_name": "PLTR058", "easting_m": 536259, "northing_m": 2896405, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 50, "actual_length_m": 50, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR021", "drillhole_name": "PLTR063", "easting_m": 536385, "northing_m": 2895670, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 180, "actual_length_m": 180, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR022", "drillhole_name": "MPTR014", "easting_m": 536924, "northing_m": 2895379, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 800, "actual_length_m": 810, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "Target 800 m; foré 810 m."}, {"permit_key": "NSOUR", "trench_id": "CNTR023", "drillhole_name": "MPTR006", "easting_m": 536308, "northing_m": 2896081, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 700, "actual_length_m": 700, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR024", "drillhole_name": "MPTR010", "easting_m": 534299, "northing_m": 2898874, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 350, "actual_length_m": 350, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "La correspondance CNTR024 diffère du daily report du 02/01; conservée par source."}, {"permit_key": "NSOUR", "trench_id": "CNTR025", "drillhole_name": "MPTR002", "easting_m": 534360, "northing_m": 2898448, "elevation_m": 421, "azimuth_deg": 60, "dip_deg": 0, "target_length_m": 220, "actual_length_m": 220, "status": "completed", "campaign": 2024, "source_id": "SAHARA2024", "notes": "La correspondance CNTR025 diffère du daily report du 02/01; conservée par source."}, {"permit_key": "NSOUR", "trench_id": "CNTR020", "drillhole_name": "PLTR058", "easting_m": 536259.0, "northing_m": 2896405, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 50, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR019", "drillhole_name": "PLTR060", "easting_m": 536171.0, "northing_m": 2896809, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 70, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR021", "drillhole_name": "PLTR063", "easting_m": 536385.0, "northing_m": 2895670, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 180, "actual_length_m": null, "status": "planned", "campaign": "Priority 1", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR022", "drillhole_name": "MPTR014", "easting_m": 536924.7438, "northing_m": 2895379.123, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 800, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR023", "drillhole_name": "MPTR006", "easting_m": 536308, "northing_m": 2896081, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 700, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR024", "drillhole_name": "MPTR020", "easting_m": 535499.516, "northing_m": 2896558.089, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 230, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": "Correspondance de nom différente du rapport Sahara Gold 2024."}, {"permit_key": "NSOUR", "trench_id": "CNTR025", "drillhole_name": "MPTR021", "easting_m": 535538.6748, "northing_m": 2896853.615, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 450, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": "Correspondance de nom différente du rapport Sahara Gold 2024."}, {"permit_key": "NSOUR", "trench_id": "CNTR026", "drillhole_name": "MPTR025", "easting_m": 535300.0149, "northing_m": 2897034.229, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 80, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR027", "drillhole_name": "MPTR015", "easting_m": 535072.7771, "northing_m": 2897039.492, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 100, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR028", "drillhole_name": "MPTR007", "easting_m": 534908.6074, "northing_m": 2897490.544, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 280, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR029", "drillhole_name": "MPTR005", "easting_m": 534799.1609, "northing_m": 2897791.246, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 280, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR030", "drillhole_name": "MPTR001", "easting_m": 534361, "northing_m": 2898448, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 150, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR031", "drillhole_name": "MPTR002", "easting_m": 534361, "northing_m": 2898448, "elevation_m": 0, "azimuth_deg": 60, "dip_deg": null, "target_length_m": 220, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "CNTR032", "drillhole_name": "MPTR010", "easting_m": 534299.5641, "northing_m": 2898874.41, "elevation_m": 0, "azimuth_deg": 240, "dip_deg": null, "target_length_m": 400, "actual_length_m": null, "status": "planned", "campaign": "Priority 2", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-01", "drillhole_name": "TP1", "easting_m": 534347, "northing_m": 2898383, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 150, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": "Le texte dit 380 m proposés, mais les longueurs listées totalisent 680 m."}, {"permit_key": "NSOUR", "trench_id": "TP-02", "drillhole_name": "TP2", "easting_m": 534720, "northing_m": 2897921, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 150, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-03", "drillhole_name": "TP3", "easting_m": 534989, "northing_m": 2897355, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 180, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-04", "drillhole_name": "TP4", "easting_m": 535257, "northing_m": 2897018, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}, {"permit_key": "NSOUR", "trench_id": "TP-05", "drillhole_name": "TP5", "easting_m": 536268, "northing_m": 2895821, "elevation_m": 421, "azimuth_deg": 240, "dip_deg": 0, "target_length_m": 100, "actual_length_m": null, "status": "proposed", "campaign": "Priority 3", "source_id": "DAILY_2025_01_02", "notes": null}];
+
+  const FALLBACK_PITS = [{"pit_id": "Pit-01", "easting_m": 534598, "northing_m": 2898996, "samples": [{"sample_id": "Pit-01-NS01", "rock_vein_type": "Roche mafique", "depth_m": 1.3, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-01-NS02", "rock_vein_type": "QVN", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-01-NS03", "rock_vein_type": "QVN + calcite", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-01-NS04", "rock_vein_type": "QVN", "depth_m": 8.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-02", "easting_m": 536995, "northing_m": 2897186, "samples": [{"sample_id": "Pit-02-NS05", "rock_vein_type": "QVN + calcite", "depth_m": 1.5, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-02-NS06", "rock_vein_type": "QVN + calcite", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-02-NS07", "rock_vein_type": "QVN", "depth_m": 4.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-03", "easting_m": 537199, "northing_m": 2896955, "samples": [{"sample_id": "Pit-03-NS08", "rock_vein_type": "QVN", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-03-NS09", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-03-NS10", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-04", "easting_m": 537264, "northing_m": 2896758, "samples": [{"sample_id": "Pit-04-NS11", "rock_vein_type": "QVN", "depth_m": 3.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-04-NS12", "rock_vein_type": "QVN", "depth_m": 5.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-05", "easting_m": 537406, "northing_m": 2896654, "samples": [{"sample_id": "Pit-05-NS13", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-05-NS14", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-06", "easting_m": 537451, "northing_m": 2896519, "samples": [{"sample_id": "Pit-06-NS15", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 0.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-07", "easting_m": 537644, "northing_m": 2896473, "samples": [{"sample_id": "Pit-07-NS16", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 0.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-08", "easting_m": 537069, "northing_m": 2891050, "samples": [{"sample_id": "Pit-08-NS17", "rock_vein_type": "QVN + calcite", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-08-NS18", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 3.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-09", "easting_m": 537128, "northing_m": 2890944, "samples": [{"sample_id": "Pit-09-NS19", "rock_vein_type": "Quartz fumé (QVN)", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-10", "easting_m": 534208, "northing_m": 2898802, "samples": [{"sample_id": "Pit-10-NS20", "rock_vein_type": "QVN + granite", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-10-NS21", "rock_vein_type": "QVN", "depth_m": 5.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-11", "easting_m": 534074, "northing_m": 2899131, "samples": [{"sample_id": "Pit-11-NS22", "rock_vein_type": "QVN", "depth_m": 1.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-11", "easting_m": 534484, "northing_m": 2899131, "samples": [{"sample_id": "Pit-11-NS23", "rock_vein_type": "QVN", "depth_m": 8.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-12", "easting_m": 534074, "northing_m": 2898130, "samples": [{"sample_id": "Pit-12-NS24", "rock_vein_type": "QVN", "depth_m": 3.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-12", "easting_m": 534542, "northing_m": 2898130, "samples": [{"sample_id": "Pit-12-NS25", "rock_vein_type": "Granite + calcite", "depth_m": 1.5, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-13", "easting_m": 534074, "northing_m": 2898071, "samples": [{"sample_id": "Pit-13-NS26", "rock_vein_type": "Calcite", "depth_m": 13.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-14", "easting_m": 534604, "northing_m": 2898062, "samples": [{"sample_id": "Pit-14-NS27", "rock_vein_type": "QVN + granite", "depth_m": 7.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-15", "easting_m": 534642, "northing_m": 2897991, "samples": [{"sample_id": "Pit-15-NS28", "rock_vein_type": "QVN", "depth_m": 6.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-16", "easting_m": 534665, "northing_m": 2897953, "samples": [{"sample_id": "Pit-16-NS29", "rock_vein_type": "QVN + granite", "depth_m": 16.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-17", "easting_m": 534671, "northing_m": 2897941, "samples": [{"sample_id": "Pit-17-NS30", "rock_vein_type": "QVN", "depth_m": 18.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-18", "easting_m": 534632, "northing_m": 2897838, "samples": [{"sample_id": "Pit-18-NS31", "rock_vein_type": "QVN", "depth_m": 12.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-19", "easting_m": 534744, "northing_m": 2897677, "samples": [{"sample_id": "Pit-19-NS32", "rock_vein_type": "QVN + granite", "depth_m": 10.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-20", "easting_m": 534743, "northing_m": 2897655, "samples": [{"sample_id": "Pit-20-NS33", "rock_vein_type": "QVN + granite", "depth_m": 12.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-20-NS34", "rock_vein_type": "QVN + granite", "depth_m": 12.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-21", "easting_m": 534783, "northing_m": 2897616, "samples": [{"sample_id": "Pit-21-NS35", "rock_vein_type": "QVN + granite", "depth_m": 10.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-22", "easting_m": 534938, "northing_m": 2897381, "samples": [{"sample_id": "Pit-22-NS36", "rock_vein_type": "QVN", "depth_m": 14.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-23", "easting_m": 534905, "northing_m": 2897302, "samples": [{"sample_id": "Pit-23-NS37", "rock_vein_type": "QVN", "depth_m": 2.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-23", "easting_m": 534906, "northing_m": 2897885, "samples": [{"sample_id": "Pit-23-NS38", "rock_vein_type": "QVN", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-23", "easting_m": 534937, "northing_m": 2897249, "samples": [{"sample_id": "Pit-23-NS39", "rock_vein_type": "QVN", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-24", "easting_m": 534998, "northing_m": 2897123, "samples": [{"sample_id": "Pit-24-NS40", "rock_vein_type": "QVN + granite", "depth_m": 22.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-25", "easting_m": 534956, "northing_m": 2897030, "samples": [{"sample_id": "Pit-25-NS41", "rock_vein_type": "QVN", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-26", "easting_m": 535024, "northing_m": 2896949, "samples": [{"sample_id": "Pit-26-NS42", "rock_vein_type": "QVN", "depth_m": 10.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-27", "easting_m": 535057, "northing_m": 2896894, "samples": [{"sample_id": "Pit-27-NS43", "rock_vein_type": "QVN", "depth_m": 20.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-28", "easting_m": 535368, "northing_m": 2896513, "samples": [{"sample_id": "Pit-28-NS44", "rock_vein_type": "QVN + granite", "depth_m": 14.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-29", "easting_m": 535438, "northing_m": 2896378, "samples": [{"sample_id": "Pit-29-NS45", "rock_vein_type": "Granite altéré", "depth_m": 1.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-29-NS46", "rock_vein_type": "QVN", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-30", "easting_m": 536056, "northing_m": 2896160, "samples": [{"sample_id": "Pit-30-NS47", "rock_vein_type": "Granite + schiste", "depth_m": 24.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-31", "easting_m": 536089, "northing_m": 2896038, "samples": [{"sample_id": "Pit-31-NS48", "rock_vein_type": "Granite + schiste", "depth_m": 12.0, "source_id": "CHAPII_NSOUR"}]}, {"pit_id": "Pit-32", "easting_m": 536212, "northing_m": 2895819, "samples": [{"sample_id": "Pit-32-NS49", "rock_vein_type": "QVN", "depth_m": 4.0, "source_id": "CHAPII_NSOUR"}, {"sample_id": "Pit-32-NS50", "rock_vein_type": "QVN", "depth_m": 6.0, "source_id": "CHAPII_NSOUR"}]}];
+
+  const FALLBACK_GH_AU = [{"trench_id": "CNTR012", "drillhole_name": "PLTR072", "easting_m": 534835, "northing_m": 2896856, "max_au_ppm": 0.5, "samples": [{"sample_id": "GH-01", "au_reported_text": 0.03, "au_ppm": 0.03, "qualifier": "Reported", "from_m": 28, "to_m": 29, "description": "Granite-gneiss", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-02", "au_reported_text": 0.5, "au_ppm": 0.5, "qualifier": "Reported", "from_m": 29, "to_m": 30, "description": "QVN 20 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-03", "au_reported_text": 0.02, "au_ppm": 0.02, "qualifier": "Reported", "from_m": 30, "to_m": 31, "description": "Granite-gneiss", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR013", "drillhole_name": "PLTR045", "easting_m": 534539, "northing_m": 2896913, "max_au_ppm": 0.01, "samples": [{"sample_id": "GH-04", "au_reported_text": 0.01, "au_ppm": 0.01, "qualifier": "Reported", "from_m": 50, "to_m": 60, "description": "Granite sulfuré", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-05", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 27, "to_m": 28, "description": "QVN en face", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR001", "drillhole_name": "PLTR016", "easting_m": 536251, "northing_m": 2895445, "max_au_ppm": 0.01, "samples": [{"sample_id": "GH-06", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 126, "to_m": 127, "description": "QVN", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-07", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 182, "to_m": 183, "description": "QVN", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-08", "au_reported_text": 0.01, "au_ppm": 0.01, "qualifier": "Reported", "from_m": 240, "to_m": 241, "description": "QVN", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR003", "drillhole_name": "PLTR020", "easting_m": 535590, "northing_m": 2895291, "max_au_ppm": 0.49, "samples": [{"sample_id": "GH-09", "au_reported_text": 0.49, "au_ppm": 0.49, "qualifier": "Reported", "from_m": 59, "to_m": 60, "description": "QVN 5 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR010", "drillhole_name": "PLTR026", "easting_m": 535128, "northing_m": 2895752, "max_au_ppm": 0.01, "samples": [{"sample_id": "GH-10", "au_reported_text": 0.01, "au_ppm": 0.01, "qualifier": "Reported", "from_m": 40, "to_m": 41, "description": "QVN 5 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-11", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 58, "to_m": 59, "description": "QVN 5 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}, {"sample_id": "GH-12", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 74, "to_m": 75, "description": "QVN 5 en face", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR016", "drillhole_name": "PLTR054", "easting_m": 534360, "northing_m": 2898447, "max_au_ppm": 0.52, "samples": [{"sample_id": "GH-13", "au_reported_text": 0.52, "au_ppm": 0.52, "qualifier": "Reported", "from_m": 149, "to_m": 150, "description": "QVN 20 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR018", "drillhole_name": "PLTR075", "easting_m": 535598, "northing_m": 2897160, "max_au_ppm": 0.01, "samples": [{"sample_id": "GH-14", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 45, "to_m": 46.5, "description": "QVN 5 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}, {"trench_id": "CNTR019", "drillhole_name": "PLTR060", "easting_m": 536171.0, "northing_m": 2896809, "max_au_ppm": 0.01, "samples": [{"sample_id": "GH-15", "au_reported_text": "<0.01", "au_ppm": 0.01, "qualifier": "<", "from_m": 26, "to_m": 27, "description": "QVN 5 cm", "method": "Au-AA26", "project_code": "MMM-24-08", "workorder": "LR25048269"}]}];  const RC_CONCHITA_DATA = [{"hole_id": "11NSRC001", "zone_name": "Conchita", "reassays": [{"from_m": 27, "to_m": 28, "interval_m": 1, "quartz_description": "QV 80 %", "au_reported_text": 0.02, "au_ppm": 0.02, "sample_id": "E01029"}, {"from_m": 28, "to_m": 29, "interval_m": 1, "quartz_description": "QV 10 %", "au_reported_text": 1.5, "au_ppm": 1.5, "sample_id": "E01030"}, {"from_m": 30, "to_m": 31, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": 1.18, "au_ppm": 1.18, "sample_id": "E01032"}, {"from_m": 31, "to_m": 32, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": 0.08, "au_ppm": 0.08, "sample_id": "E01033"}]}, {"hole_id": "11NSRC002", "zone_name": "Conchita", "reassays": [{"from_m": 55, "to_m": 56, "interval_m": 1, "quartz_description": "QV 10 %", "au_reported_text": 2.89, "au_ppm": 2.89, "sample_id": "E01114"}]}, {"hole_id": "11NSRC003", "zone_name": "Conchita", "reassays": [{"from_m": 11, "to_m": 12, "interval_m": 1, "quartz_description": "QV 80 %", "au_reported_text": 0.09, "au_ppm": 0.09, "sample_id": "E01148"}]}, {"hole_id": "11NSRC007", "zone_name": "Conchita", "reassays": [{"from_m": 39, "to_m": 40, "interval_m": 1, "quartz_description": "QV 80 %", "au_reported_text": 0.48, "au_ppm": 0.48, "sample_id": "E01382"}]}, {"hole_id": "11NSRC008", "zone_name": "Conchita", "reassays": [{"from_m": 4, "to_m": 5, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": "BD", "au_ppm": null, "sample_id": "E01397"}]}, {"hole_id": "11NSRC010", "zone_name": "Conchita", "reassays": [{"from_m": 10, "to_m": 11, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": 0.87, "au_ppm": 0.87, "sample_id": "E01496"}, {"from_m": 11, "to_m": 12, "interval_m": 1, "quartz_description": "QV 10 %", "au_reported_text": 0.16, "au_ppm": 0.16, "sample_id": "E01497"}]}, {"hole_id": "11NSRC011", "zone_name": "Conchita", "reassays": [{"from_m": 34, "to_m": 35, "interval_m": 1, "quartz_description": "QV 30 %", "au_reported_text": 2.94, "au_ppm": 2.94, "sample_id": "E01555"}, {"from_m": 35, "to_m": 36, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": 0.46, "au_ppm": 0.46, "sample_id": "E01556"}]}, {"hole_id": "11NSRC016", "zone_name": "Conchita", "reassays": [{"from_m": 29, "to_m": 30, "interval_m": 1, "quartz_description": "QV 90 %", "au_reported_text": 7.26, "au_ppm": 7.26, "sample_id": "E01774"}, {"from_m": 30, "to_m": 31, "interval_m": 1, "quartz_description": "QV 80 %", "au_reported_text": 6.59, "au_ppm": 6.59, "sample_id": "E01775"}]}, {"hole_id": "11NSRC025", "zone_name": "Conchita", "reassays": [{"from_m": 36, "to_m": 37, "interval_m": 1, "quartz_description": "QV 90 %", "au_reported_text": 5.26, "au_ppm": 5.26, "sample_id": "E02417"}, {"from_m": 37, "to_m": 38, "interval_m": 1, "quartz_description": "QV 20 %", "au_reported_text": 15.2, "au_ppm": 15.2, "sample_id": "E02418"}], "intercepts": [{"from_m": 23, "to_m": 27, "thickness_calc_m": 4, "au_grade_ppm": 0.81, "note": "Le texte de source affiche '16h00' dans la colonne épaisseur; l'épaisseur calculée depuis/à est 4 m."}, {"from_m": 35, "to_m": 40, "thickness_calc_m": 5, "au_grade_ppm": 3.35, "note": "Commentaire source: 4,39 g/t non coupé."}]}, {"hole_id": "11NSRC027", "zone_name": "Conchita", "reassays": [{"from_m": 25, "to_m": 26, "interval_m": 1, "quartz_description": "—", "au_reported_text": 5.64, "au_ppm": 5.64, "sample_id": "E02524"}, {"from_m": 26, "to_m": 27, "interval_m": 1, "quartz_description": "QV 60 %", "au_reported_text": 6.35, "au_ppm": 6.35, "sample_id": "E02525"}], "intercepts": [{"from_m": 25, "to_m": 28, "thickness_calc_m": 3, "au_grade_ppm": 4.03, "note": null}]}, {"hole_id": "11NSRC036", "zone_name": "Conchita", "reassays": [{"from_m": 27, "to_m": 28, "interval_m": 1, "quartz_description": "QV 70 %", "au_reported_text": 10.5, "au_ppm": 10.5, "sample_id": "E03084"}]}, {"hole_id": "11NSRC037", "zone_name": "Conchita", "reassays": [{"from_m": 29, "to_m": 30, "interval_m": 1, "quartz_description": "QV 50 %", "au_reported_text": 1.59, "au_ppm": 1.59, "sample_id": "E03138"}], "intercepts": [{"from_m": 21, "to_m": 24, "thickness_calc_m": 3, "au_grade_ppm": 0.58, "note": null}, {"from_m": 28, "to_m": 31, "thickness_calc_m": 3, "au_grade_ppm": 0.7, "note": null}, {"from_m": 42, "to_m": 45, "thickness_calc_m": 3, "au_grade_ppm": 0.95, "note": null}]}, {"hole_id": "11NSRC021", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 30, "to_m": 40, "thickness_calc_m": 10, "au_grade_ppm": 1.41, "note": null}]}, {"hole_id": "12NSRC041", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 53, "to_m": 56, "thickness_calc_m": 3, "au_grade_ppm": 3.48, "note": null}]}, {"hole_id": "11NSRC020", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 18, "to_m": 21, "thickness_calc_m": 3, "au_grade_ppm": 3.55, "note": null}]}, {"hole_id": "12NSRC053", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 21, "to_m": 24, "thickness_calc_m": 3, "au_grade_ppm": 2.19, "note": null}]}, {"hole_id": "12NSRC045", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 29, "to_m": 35, "thickness_calc_m": 6, "au_grade_ppm": 2.14, "note": null}]}, {"hole_id": "11NSRC024", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 29, "to_m": 33, "thickness_calc_m": 4, "au_grade_ppm": 1.86, "note": "Le texte de source affiche '16h00'; épaisseur calculée 4 m."}]}, {"hole_id": "12NSRC061", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 58, "to_m": 62, "thickness_calc_m": 4, "au_grade_ppm": 2.14, "note": "Le texte de source affiche '16h00'; épaisseur calculée 4 m."}]}, {"hole_id": "12NSRC058", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 19, "to_m": 23, "thickness_calc_m": 4, "au_grade_ppm": 0.75, "note": "Le texte de source affiche '16h00'; épaisseur calculée 4 m."}]}, {"hole_id": "11NSRC026", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 32, "to_m": 37, "thickness_calc_m": 5, "au_grade_ppm": 1.73, "note": null}]}, {"hole_id": "12NSRC070", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 76, "to_m": 79, "thickness_calc_m": 3, "au_grade_ppm": 2.81, "note": null}]}, {"hole_id": "12NSRC067", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 19, "to_m": 22, "thickness_calc_m": 3, "au_grade_ppm": 0.89, "note": null}]}, {"hole_id": "12NSRC064", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 7, "to_m": 18, "thickness_calc_m": 11, "au_grade_ppm": 1.24, "note": null}]}, {"hole_id": "12NSRC063", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 46, "to_m": 49, "thickness_calc_m": 3, "au_grade_ppm": 1.47, "note": null}, {"from_m": 136, "to_m": 139, "thickness_calc_m": 3, "au_grade_ppm": 2.17, "note": null}]}, {"hole_id": "11NSRC028", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 21, "to_m": 27, "thickness_calc_m": 6, "au_grade_ppm": 1.71, "note": null}]}, {"hole_id": "11NSRC029", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 21, "to_m": 29, "thickness_calc_m": 8, "au_grade_ppm": 0.87, "note": null}, {"from_m": 39, "to_m": 42, "thickness_calc_m": 3, "au_grade_ppm": 2.14, "note": null}]}, {"hole_id": "11NSRC034", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 17, "to_m": 20, "thickness_calc_m": 3, "au_grade_ppm": 0.55, "note": null}]}, {"hole_id": "11NSRC032", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 22, "to_m": 25, "thickness_calc_m": 3, "au_grade_ppm": 2.37, "note": null}]}, {"hole_id": "11NSRC031", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 25, "to_m": 28, "thickness_calc_m": 3, "au_grade_ppm": 0.95, "note": null}]}, {"hole_id": "11NSRC035", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 33, "to_m": 36, "thickness_calc_m": 3, "au_grade_ppm": 1.04, "note": "La colonne suivante du tableau semble afficher 3,00 à 0,95; divergence conservée en note."}]}, {"hole_id": "12NSRC073", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 25, "to_m": 28, "thickness_calc_m": 3, "au_grade_ppm": 1.14, "note": null}, {"from_m": 32, "to_m": 35, "thickness_calc_m": 3, "au_grade_ppm": 0.6, "note": null}]}, {"hole_id": "11NSRC018", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 30, "to_m": 33, "thickness_calc_m": 3, "au_grade_ppm": 0.57, "note": null}]}, {"hole_id": "11NSRC019", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 43, "to_m": 46, "thickness_calc_m": 3, "au_grade_ppm": 2.15, "note": null}, {"from_m": 75, "to_m": 78, "thickness_calc_m": 3, "au_grade_ppm": 2.87, "note": null}]}, {"hole_id": "11NSRC013", "zone_name": "Conchita Sud", "reassays": [], "intercepts": [{"from_m": 12, "to_m": 18, "thickness_calc_m": 6, "au_grade_ppm": 1.27, "note": null}]}];
+
+  async function loadTrenches(){
+    const status = document.getElementById("mapStatus");
+
+  
+    function drawRows(rows, sourceLabel){
+      trenchMarkers = [];
+      trenchLayer.clearLayers();
+
+      rows.forEach(row=>{
+        const e = Number(row.easting_m), n = Number(row.northing_m);
+        if(!Number.isFinite(e) || !Number.isFinite(n)) return;
+
+        const [lat,lon] = utmToLatLon(e,n,29,true);
+        const statusKey = String(row.status || "").toLowerCase();
+
+        let fill = "#d8b451";
+        if(statusKey === "completed") fill = "#54a77b";
+        if(statusKey === "planned") fill = "#8fb7ff";
+        if(statusKey === "proposed") fill = "#e0a25d";
+
+        const marker = L.circleMarker([lat,lon],{
+          radius:6,
+          weight:2,
+          color:"#f4f7f5",
+          fillColor:fill,
+          fillOpacity:.92
+        });
+
+        const name = row.trench_id || row.drillhole_name || "Tranchée";
+        marker._nsourSearch = String(name + " " + (row.drillhole_name || "")).toLowerCase();
+
+        marker.bindPopup(`
+          <div class="nsour-popup">
+            <b>${esc(name)}</b>
+            <table>
+              <tr><td>Nom terrain</td><td>${esc(row.drillhole_name)}</td></tr>
+              <tr><td>Easting</td><td>${esc(row.easting_m)} m</td></tr>
+              <tr><td>Northing</td><td>${esc(row.northing_m)} m</td></tr>
+              <tr><td>Longueur cible</td><td>${esc(row.target_length_m)} m</td></tr>
+              <tr><td>Longueur réelle</td><td>${esc(row.actual_length_m)} m</td></tr>
+              <tr><td>Azimut</td><td>${esc(row.azimuth_deg)}°</td></tr>
+              <tr><td>Pendage</td><td>${esc(row.dip_deg)}°</td></tr>
+              <tr><td>Statut</td><td>${esc(row.status)}</td></tr>
+              <tr><td>Campagne</td><td>${esc(row.campaign)}</td></tr>
+              <tr><td>Source</td><td>${esc(sourceLabel)}</td></tr>
+            </table>
+          </div>
+        `);
+
+        marker.addTo(trenchLayer);
+        trenchMarkers.push(marker);
+      });
+
+      document.getElementById("mapTrenchCount").textContent =
+        trenchMarkers.length.toLocaleString("fr-FR");
+
+      status.textContent =
+        `Carte active · ${trenchMarkers.length} tranchée(s) cartographiée(s) · ${sourceLabel}`;
+    }
+
+    try{
+      const params = new URLSearchParams();
+      params.set("select","trench_id,drillhole_name,easting_m,northing_m,elevation_m,azimuth_deg,dip_deg,target_length_m,actual_length_m,status,campaign,notes");
+      params.set("permit_key","eq.NSOUR");
+      params.set("order","trench_id.asc");
+
+      const res = await fetch(API + "/explorer_trenches?" + params.toString(), {
+        headers:{"Accept":"application/json"}
+      });
+
+      if(!res.ok) throw new Error("HTTP " + res.status);
+
+      const rows = await res.json();
+      if(!Array.isArray(rows)) throw new Error("Réponse inattendue");
+
+      const valid = rows.filter(r =>
+        Number.isFinite(Number(r.easting_m)) &&
+        Number.isFinite(Number(r.northing_m))
+      );
+
+      if(!valid.length) throw new Error("Aucune tranchée géoréférencée retournée");
+
+      drawRows(valid, "Neon");
+    }catch(err){
+      drawRows(FALLBACK_TRENCHES, "référentiel Nsour intégré");
+    }
+  }
+
+  async function loadPits(){
+    const rows = FALLBACK_PITS;
+    pitMarkers = [];
+    pitLayer.clearLayers();
+
+    rows.forEach(row=>{
+      const e = Number(row.easting_m), n = Number(row.northing_m);
+      if(!Number.isFinite(e) || !Number.isFinite(n)) return;
+
+      const [lat,lon] = utmToLatLon(e,n,29,true);
+      const marker = L.circleMarker([lat,lon],{
+        radius:5,
+        weight:2,
+        color:"#fff2ff",
+        fillColor:"#d86bd4",
+        fillOpacity:.92
+      });
+
+      const samples = Array.isArray(row.samples) ? row.samples : [];
+      marker._nsourSearch = String(
+        (row.pit_id || "") + " " + samples.map(s=>s.sample_id || "").join(" ")
+      ).toLowerCase();
+
+      const rowsHtml = samples.map(s => `
+        <tr>
+          <td>${esc(s.sample_id)}</td>
+          <td>${esc(s.rock_vein_type)}</td>
+          <td>${esc(s.depth_m)} m</td>
+        </tr>`).join("");
+
+      marker.bindPopup(`
+        <div class="nsour-popup">
+          <b>${esc(row.pit_id)}</b>
+          <div style="margin:4px 0 7px;color:#60756b">${samples.length} échantillon(s)</div>
+          <table>
+            <tr><td>Easting</td><td>${esc(row.easting_m)} m</td></tr>
+            <tr><td>Northing</td><td>${esc(row.northing_m)} m</td></tr>
+          </table>
+          <table style="margin-top:7px">
+            <tr><td><b>Échantillon</b></td><td><b>Type</b></td><td><b>Prof.</b></td></tr>
+            ${rowsHtml}
+          </table>
+        </div>
+      `);
+
+      marker.addTo(pitLayer);
+      pitMarkers.push(marker);
+    });
+
+    document.getElementById("mapPitCount").textContent =
+      pitMarkers.length.toLocaleString("fr-FR");
+  }
+
+  async function loadAu(){
+    const rows = FALLBACK_GH_AU;
+    auMarkers = [];
+    auLayer.clearLayers();
+
+    function auColor(v){
+      const x = Number(v);
+      if(!Number.isFinite(x)) return "#b8c3bf";
+      if(x >= 0.50) return "#ff5f57";
+      if(x >= 0.10) return "#ffb347";
+      return "#c7d95b";
+    }
+
+    rows.forEach(row=>{
+      const e = Number(row.easting_m), n = Number(row.northing_m);
+      if(!Number.isFinite(e) || !Number.isFinite(n)) return;
+
+      const [lat,lon] = utmToLatLon(e,n,29,true);
+      const maxAu = Number(row.max_au_ppm);
+
+      const marker = L.circleMarker([lat,lon],{
+        radius:9,
+        weight:3,
+        color:auColor(maxAu),
+        fillColor:"#07120f",
+        fillOpacity:.12
+      });
+      marker._auValue = maxAu;
+      marker._auCategory =
+        !Number.isFinite(maxAu) ? "unknown" :
+        maxAu >= 0.50 ? "high" :
+        maxAu >= 0.10 ? "medium" : "low";
+
+      marker._nsourSearch = String(
+        (row.trench_id || "") + " " +
+        (row.drillhole_name || "") + " " +
+        (row.samples || []).map(s=>s.sample_id || "").join(" ")
+      ).toLowerCase();
+
+      const sampleRows = (row.samples || []).map(s=>`
+        <tr>
+          <td>${esc(s.sample_id)}</td>
+          <td>${esc(s.au_reported_text)} ppm</td>
+          <td>${esc(s.from_m)}–${esc(s.to_m)} m</td>
+          <td>${esc(s.description)}</td>
+        </tr>`).join("");
+
+      marker.bindPopup(`
+        <div class="nsour-popup">
+          <b>${esc(row.trench_id)} — Au (GH)</b>
+          <div style="margin:4px 0 7px;color:#60756b">
+            Position affichée = point de référence de la tranchée, car les GH n'ont pas de coordonnées propres dans le jeu disponible.
+          </div>
+          <table>
+            <tr><td>Nom terrain</td><td>${esc(row.drillhole_name)}</td></tr>
+            <tr><td>Au max GH</td><td><b>${esc(row.max_au_ppm)} ppm</b></td></tr>
+          </table>
+          <table style="margin-top:7px">
+            <tr><td><b>Échantillon</b></td><td><b>Au</b></td><td><b>Intervalle</b></td><td><b>Description</b></td></tr>
+            ${sampleRows}
+          </table>
+        </div>
+      `);
+
+      marker.addTo(auLayer);
+      auMarkers.push(marker);
+    });
+
+    document.getElementById("mapAuCount").textContent =
+      auMarkers.length.toLocaleString("fr-FR");
+
+    const finiteAu = auMarkers
+      .map(m => m._auValue)
+      .filter(v => Number.isFinite(v));
+    const maxAu = finiteAu.length ? Math.max(...finiteAu) : null;
+    document.getElementById("mapAuMax").textContent =
+      maxAu === null ? "—" : maxAu.toFixed(2).replace(".", ",");
+
+    applyAuFilter();
+  }
+
+  function applyAuFilter(){
+    if(!auLayer) return;
+    const mode = document.getElementById("auFilter")?.value || "all";
+    auLayer.clearLayers();
+
+    let visible = 0;
+    auMarkers.forEach(marker=>{
+      if(mode === "all" || marker._auCategory === mode){
+        marker.addTo(auLayer);
+        visible++;
+      }
+    });
+
+    const count = document.getElementById("mapAuCount");
+    if(count){
+      count.textContent = mode === "all"
+        ? auMarkers.length.toLocaleString("fr-FR")
+        : `${visible}/${auMarkers.length}`;
+    }
+  }
+
+  function renderRcPanel(query=""){
+    const q = String(query || "").trim().toLowerCase();
+
+    const rcSortKey = (id)=>{
+      const s = String(id || "");
+      const m = s.match(/^(\d{2})NSRC(\d+)$/i);
+      if(!m) return [999,999999];
+      return [Number(m[1]), Number(m[2])];
+    };
+
+    const data = RC_CONCHITA_DATA
+      .filter(r => {
+        if(!q) return true;
+        return String(r.hole_id || "").toLowerCase().includes(q)
+          || String(r.zone_name || "").toLowerCase().includes(q);
+      })
+      .sort((a,b)=>{
+        const ka = rcSortKey(a.hole_id), kb = rcSortKey(b.hole_id);
+        return ka[0]-kb[0] || ka[1]-kb[1];
+      });
+
+    const allGrades = [];
+    RC_CONCHITA_DATA.forEach(r=>{
+      (r.reassays || []).forEach(x=>{
+        const v = Number(x.au_ppm);
+        if(Number.isFinite(v)) allGrades.push(v);
+      });
+      (r.intercepts || []).forEach(x=>{
+        const v = Number(x.au_grade_ppm);
+        if(Number.isFinite(v)) allGrades.push(v);
+      });
+    });
+
+    const maxAu = allGrades.length ? Math.max(...allGrades) : null;
+    const summary = document.getElementById("rcSummary");
+    if(summary){
+      summary.innerHTML =
+        `Forages avec résultats disponibles : <b>${RC_CONCHITA_DATA.length}</b><br>` +
+        `Classement : <b>ordre croissant des numéros RC</b><br>` +
+        `Au max documenté : <b>${maxAu === null ? "—" : maxAu.toFixed(2)} g/t</b><br>` +
+        `Position cartographique : <b>non disponible</b>`;
+    }
+
+    const box = document.getElementById("rcResults");
+    const statusBox = document.getElementById("rcSearchStatus");
+    if(!box) return;
+
+    if(!data.length){
+      if(statusBox) statusBox.innerHTML = `Aucun résultat pour <b>${esc(query)}</b>. Essayez par exemple <b>11NSRC025</b>.`;
+      box.innerHTML = '<div class="map-coordinate">Aucun forage correspondant.</div>';
+      return;
+    }
+
+    if(statusBox){
+      statusBox.innerHTML = q
+        ? `Résultat trouvé : <b>${data.length}</b> forage(s)`
+        : `Forages disponibles : <b>${data.length}</b>`;
+    }
+
+    box.innerHTML = data.map(r=>{
+      const lines = [];
+
+      (r.reassays || []).forEach(x=>{
+        lines.push(`
+          <div style="padding:8px 0;border-bottom:1px solid #27493b">
+            <div><b>Réanalyse</b> — ${esc(x.from_m)}–${esc(x.to_m)} m</div>
+            <div style="margin-top:4px"><b>Au :</b> ${esc(x.au_reported_text)} g/t</div>
+            <div><b>Quartz :</b> ${esc(x.quartz_description)}</div>
+            <div><b>Échantillon :</b> ${esc(x.sample_id)}</div>
+          </div>
+        `);
+      });
+
+      (r.intercepts || []).forEach(x=>{
+        lines.push(`
+          <div style="padding:8px 0;border-bottom:1px solid #27493b">
+            <div><b>Intercept</b> — ${esc(x.from_m)}–${esc(x.to_m)} m</div>
+            <div style="margin-top:4px"><b>Au :</b> ${esc(x.au_grade_ppm)} g/t</div>
+            <div><b>Épaisseur :</b> ${esc(x.thickness_calc_m)} m</div>
+            ${x.note ? `<div><b>Note :</b> ${esc(x.note)}</div>` : ""}
+          </div>
+        `);
+      });
+
+      return `
+        <div class="rc-result" style="display:block!important;overflow:visible!important">
+          <div style="font-size:18px;font-weight:700;color:#f0d67a;margin-bottom:8px">
+            ${esc(r.hole_id)}
+            <span class="rc-badge">${esc(r.zone_name)}</span>
+          </div>
+          <div style="display:block!important;color:#dce9e3!important">
+            ${lines.join("") || '<div>Aucune donnée détaillée pour ce forage.</div>'}
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function ensureMap(){
+    if(initialized || typeof L === "undefined") return;
+    initialized = true;
+
+    const permitLatLng = permitUTM.map(([e,n])=>utmToLatLon(e,n,29,true));
+
+    map = L.map("nsourMap",{
+      zoomControl:true,
+      preferCanvas:true
+    });
+
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
+      maxZoom:19,
+      attribution:"© OpenStreetMap"
+    });
+
+    const satellite = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      {maxZoom:19, attribution:"Esri World Imagery"}
+    );
+
+    satellite.addTo(map);
+
+    permitLayer = L.polygon(permitLatLng,{
+      color:"#f0d67a",
+      weight:3,
+      fillColor:"#d8b451",
+      fillOpacity:.08
+    }).bindPopup("<b>Permis Nsour 2919</b><br>371 km²<br>WGS84 / UTM 29N").addTo(map);
+
+    trenchLayer = L.layerGroup().addTo(map);
+    pitLayer = L.layerGroup().addTo(map);
+    auLayer = L.layerGroup().addTo(map);
+
+    L.control.layers(
+      {"Satellite":satellite,"OpenStreetMap":osm},
+      {"Limite du permis":permitLayer,"Tranchées":trenchLayer,"Puits / échantillons":pitLayer,"Au — GH":auLayer},
+      {collapsed:false}
+    ).addTo(map);
+
+    map.fitBounds(permitLayer.getBounds(),{padding:[20,20]});
+
+    document.getElementById("togglePermit")?.addEventListener("change",e=>{
+      if(e.target.checked) permitLayer.addTo(map); else map.removeLayer(permitLayer);
+    });
+    document.getElementById("toggleTrenches")?.addEventListener("change",e=>{
+      if(e.target.checked) trenchLayer.addTo(map); else map.removeLayer(trenchLayer);
+    });
+    document.getElementById("togglePits")?.addEventListener("change",e=>{
+      if(e.target.checked) pitLayer.addTo(map); else map.removeLayer(pitLayer);
+    });
+    document.getElementById("toggleAu")?.addEventListener("change",e=>{
+      if(e.target.checked) auLayer.addTo(map); else map.removeLayer(auLayer);
+    });
+    document.getElementById("auFilter")?.addEventListener("change",()=>{
+      applyAuFilter();
+      if(!map.hasLayer(auLayer)) auLayer.addTo(map);
+      const toggle = document.getElementById("toggleAu");
+      if(toggle) toggle.checked = true;
+    });
+    document.getElementById("openRcPanel")?.addEventListener("click",()=>{
+      const p = document.getElementById("rcPanel");
+      if(p){ p.classList.add("open"); renderRcPanel(""); }
+    });
+    document.getElementById("closeRcPanel")?.addEventListener("click",()=>{
+      document.getElementById("rcPanel")?.classList.remove("open");
+    });
+    document.getElementById("rcSearch")?.addEventListener("input",e=>{
+      if(!e.target.value.trim()) renderRcPanel("");
+    });
+    document.getElementById("rcSearch")?.addEventListener("keydown",e=>{
+      if(e.key === "Enter"){
+        e.preventDefault();
+        renderRcPanel(e.target.value);
+      }
+    });
+    document.getElementById("rcSearchBtn")?.addEventListener("click",()=>{
+      const input = document.getElementById("rcSearch");
+      renderRcPanel(input ? input.value : "");
+    });
+
+    document.getElementById("mapSearch")?.addEventListener("input",e=>{
+      const q = e.target.value.trim().toLowerCase();
+      if(!q) return;
+      const m = trenchMarkers.find(x => x._nsourSearch.includes(q))
+             || pitMarkers.find(x => x._nsourSearch.includes(q))
+             || auMarkers.find(x => x._nsourSearch.includes(q));
+      if(m){
+        if(trenchMarkers.includes(m) && !map.hasLayer(trenchLayer)) trenchLayer.addTo(map);
+        if(pitMarkers.includes(m) && !map.hasLayer(pitLayer)) pitLayer.addTo(map);
+        if(auMarkers.includes(m) && !map.hasLayer(auLayer)) auLayer.addTo(map);
+        map.setView(m.getLatLng(),15);
+        m.openPopup();
+      }
+    });
+
+    map.on("mousemove",e=>{
+      const coord = document.getElementById("mapCoordinate");
+      if(coord) coord.innerHTML =
+        `Latitude : <b>${e.latlng.lat.toFixed(6)}</b><br>`+
+        `Longitude : <b>${e.latlng.lng.toFixed(6)}</b><br>`+
+        `Référence affichée : WGS84`;
+    });
+
+    loadTrenches();
+    loadPits();
+    loadAu();
+    setTimeout(()=>map.invalidateSize(),120);
+  }
+
+  const mapBtn = document.querySelector('nav button[data-page="map"]');
+  mapBtn?.addEventListener("click",()=>{
+    setTimeout(()=>{
+      ensureMap();
+      if(map) map.invalidateSize();
+    },60);
+  });
+})();
+</script>
+
+</body>
+</html>
