@@ -706,8 +706,9 @@ main{max-width:1400px;margin:auto;padding:20px}.card{background:linear-gradient(
             <button class="terrain-btn" id="tfConvertUtm" type="button">UTM → Lat/Lon</button>
           </div>
           <div class="terrain-note" style="margin-top:8px">
-            <b>Nsour :</b> utilisez normalement la zone <b>29N</b>. Vous pouvez entrer soit Latitude/Longitude,
-            soit Easting/Northing + Zone UTM.
+            <b>Nsour :</b> utilisez la zone <b>29N</b>. Si vous saisissez Easting/Northing, ces valeurs deviennent prioritaires
+            et les anciennes coordonnées GPS sont automatiquement ignorées. L'application indique aussi si le point est
+            <b>dans</b> ou <b>hors</b> du permis 2919.
           </div>
         </div>
 
@@ -1798,6 +1799,7 @@ document.addEventListener("click", function(e){
 
   let currentSession = null;
   let currentAccess = null;
+  let coordinateInputMode = "none"; // none | gps | latlon | utm
 
   const $ = id => document.getElementById(id);
   const num = v => v === "" || v == null ? null : Number(v);
@@ -1886,14 +1888,44 @@ document.addEventListener("click", function(e){
   }
 
 
+
+  const FIELD_PERMIT_UTM = [
+    [534000,2900000],[540000,2900000],[540000,2897000],[542000,2897000],
+    [542000,2895000],[546000,2895000],[546000,2891000],[550000,2891000],
+    [550000,2885000],[552000,2885000],[552000,2883000],[555000,2883000],
+    [555000,2878000],[558000,2878000],[558000,2856000],[553000,2856000],
+    [553000,2868000],[551000,2868000],[551000,2871000],[549000,2871000],
+    [549000,2875000],[546000,2875000],[546000,2882000],[543000,2882000],
+    [543000,2887000],[538000,2887000],[538000,2891000],[534000,2891000]
+  ];
+
+  function pointInPermitUTM(e,n){
+    let inside=false;
+    for(let i=0,j=FIELD_PERMIT_UTM.length-1;i<FIELD_PERMIT_UTM.length;j=i++){
+      const xi=FIELD_PERMIT_UTM[i][0], yi=FIELD_PERMIT_UTM[i][1];
+      const xj=FIELD_PERMIT_UTM[j][0], yj=FIELD_PERMIT_UTM[j][1];
+      const intersect=((yi>n)!=(yj>n)) && (e < (xj-xi)*(n-yi)/((yj-yi)||1e-12)+xi);
+      if(intersect) inside=!inside;
+    }
+    return inside;
+  }
+
+  function updatePermitStatusFromUtm(e,n,zone){
+    if(!Number.isFinite(e)||!Number.isFinite(n)||!Number.isFinite(zone)) return "";
+    if(zone!==29) return " · ⚠ Hors zone UTM 29N de Nsour";
+    return pointInPermitUTM(e,n) ? " · ✓ Dans le permis 2919" : " · ⚠ Hors permis 2919";
+  }
+
   function convertLatLonToUtmManual(){
     const lat=num($("tfLat")?.value), lon=num($("tfLon")?.value);
     if(!Number.isFinite(lat) || !Number.isFinite(lon)){ setMsg("Entrez d'abord Latitude et Longitude.","bad"); return; }
     const zone=Number($("tfZone")?.value)||utmZoneFromLon(lon);
     const [e,n]=latLonToUtm(lat,lon,zone);
+    coordinateInputMode="latlon";
     $("tfZone").value=String(zone); $("tfEasting").value=e.toFixed(1); $("tfNorthing").value=n.toFixed(1);
     $("tfAccuracy").value="";
-    $("tfPositionText").textContent=`Saisie manuelle · ${lat.toFixed(6)}, ${lon.toFixed(6)} · UTM ${zone}N ${e.toFixed(1)} E / ${n.toFixed(1)} N`;
+    const permitStatus=updatePermitStatusFromUtm(e,n,zone);
+    $("tfPositionText").textContent=`Saisie manuelle Lat/Lon · ${lat.toFixed(6)}, ${lon.toFixed(6)} · UTM ${zone}N ${e.toFixed(1)} E / ${n.toFixed(1)} N${permitStatus}`;
     setMsg("Coordonnées manuelles converties de Lat/Lon vers UTM.","good");
   }
 
@@ -1902,8 +1934,10 @@ document.addEventListener("click", function(e){
     if(!Number.isFinite(e)||!Number.isFinite(n)){ setMsg("Entrez d'abord Easting et Northing.","bad"); return; }
     if(!Number.isFinite(zone)||zone<1||zone>60){ setMsg("Zone UTM invalide. Pour Nsour, utilisez 29.","bad"); return; }
     const [lat,lon]=utmToLatLonManual(e,n,zone,true);
+    coordinateInputMode="utm";
     $("tfLat").value=lat.toFixed(6); $("tfLon").value=lon.toFixed(6); $("tfAccuracy").value="";
-    $("tfPositionText").textContent=`Saisie manuelle · UTM ${zone}N ${e.toFixed(1)} E / ${n.toFixed(1)} N · ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+    const permitStatus=updatePermitStatusFromUtm(e,n,zone);
+    $("tfPositionText").textContent=`Saisie manuelle UTM · UTM ${zone}N ${e.toFixed(1)} E / ${n.toFixed(1)} N · ${lat.toFixed(6)}, ${lon.toFixed(6)}${permitStatus}`;
     setMsg("Coordonnées manuelles converties de UTM vers Latitude/Longitude.","good");
   }
 
@@ -1924,6 +1958,7 @@ document.addEventListener("click", function(e){
     $("tfSampleCount").value="1";
     $("tfZone").value="29";
     $("tfObservedAt").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+    coordinateInputMode="none";
     $("tfPositionText").textContent="Aucune position enregistrée.";
     setMsg("");
   }
@@ -1942,15 +1977,37 @@ document.addEventListener("click", function(e){
     if(!hasLatLon && !hasUtm)
       throw new Error("Entrez soit Latitude/Longitude, soit Easting/Northing + zone UTM.");
 
-    if(!hasLatLon && hasUtm){
+    // Critical rule: the coordinate system edited by the user is authoritative.
+    // This prevents an old GPS/LatLon value from overriding newly typed UTM coordinates.
+    if(coordinateInputMode==="utm" && hasUtm){
       [latitude,longitude]=utmToLatLonManual(easting,northing,zone,true);
-      $("tfLat").value=latitude.toFixed(6); $("tfLon").value=longitude.toFixed(6);
-    }
-    if(!hasUtm && hasLatLon){
+      $("tfLat").value=latitude.toFixed(6);
+      $("tfLon").value=longitude.toFixed(6);
+      $("tfAccuracy").value="";
+    }else if((coordinateInputMode==="latlon" || coordinateInputMode==="gps") && hasLatLon){
+      if(coordinateInputMode==="gps"){
+        zone=utmZoneFromLon(longitude);
+      }
+      [easting,northing]=latLonToUtm(latitude,longitude,zone);
+      $("tfZone").value=String(zone);
+      $("tfEasting").value=easting.toFixed(1);
+      $("tfNorthing").value=northing.toFixed(1);
+    }else if(hasUtm && !hasLatLon){
+      [latitude,longitude]=utmToLatLonManual(easting,northing,zone,true);
+      $("tfLat").value=latitude.toFixed(6);
+      $("tfLon").value=longitude.toFixed(6);
+    }else if(hasLatLon && !hasUtm){
       zone=utmZoneFromLon(longitude);
       [easting,northing]=latLonToUtm(latitude,longitude,zone);
-      $("tfZone").value=String(zone); $("tfEasting").value=easting.toFixed(1); $("tfNorthing").value=northing.toFixed(1);
+      $("tfZone").value=String(zone);
+      $("tfEasting").value=easting.toFixed(1);
+      $("tfNorthing").value=northing.toFixed(1);
     }
+
+    const permitStatus=updatePermitStatusFromUtm(easting,northing,zone);
+    $("tfPositionText").textContent =
+      `${coordinateInputMode==="utm" ? "Saisie UTM" : coordinateInputMode==="gps" ? "GPS" : "Saisie Lat/Lon"} · `+
+      `${latitude.toFixed(6)}, ${longitude.toFixed(6)} · UTM ${zone}N ${easting.toFixed(1)} E / ${northing.toFixed(1)} N${permitStatus}`;
 
     return {
       client_uuid:uid(),
@@ -2289,10 +2346,14 @@ document.addEventListener("click", function(e){
       }
 
       const a=Number(best.coords.accuracy||9999);
+      coordinateInputMode="gps";
       $("tfLat").value=best.coords.latitude.toFixed(6);
       $("tfLon").value=best.coords.longitude.toFixed(6);
       $("tfAccuracy").value=a.toFixed(1);
       recalcUtm();
+      const ge=Number($("tfEasting").value), gn=Number($("tfNorthing").value), gz=Number($("tfZone").value);
+      const ps=updatePermitStatusFromUtm(ge,gn,gz);
+      $("tfPositionText").textContent += ps;
 
       if(a<=30){
         setMsg(`Position GPS retenue · précision ≈ ${a.toFixed(1)} m.`,"good");
@@ -2310,6 +2371,7 @@ document.addEventListener("click", function(e){
 
       if(!best || acc < Number(best.coords.accuracy||9999)){
         best=pos;
+        coordinateInputMode="gps";
         $("tfLat").value=pos.coords.latitude.toFixed(6);
         $("tfLon").value=pos.coords.longitude.toFixed(6);
         $("tfAccuracy").value=acc.toFixed(1);
@@ -2329,6 +2391,26 @@ document.addEventListener("click", function(e){
     });
 
     setTimeout(finish,31000);
+  });
+
+  ["tfEasting","tfNorthing","tfZone"].forEach(id=>{
+    $(id)?.addEventListener("input",()=>{
+      coordinateInputMode="utm";
+      $("tfLat").value="";
+      $("tfLon").value="";
+      $("tfAccuracy").value="";
+      $("tfPositionText").textContent="Saisie UTM en cours… cliquez sur UTM → Lat/Lon ou enregistrez directement.";
+    });
+  });
+
+  ["tfLat","tfLon"].forEach(id=>{
+    $(id)?.addEventListener("input",()=>{
+      coordinateInputMode="latlon";
+      $("tfEasting").value="";
+      $("tfNorthing").value="";
+      $("tfAccuracy").value="";
+      $("tfPositionText").textContent="Saisie Latitude/Longitude en cours… cliquez sur Lat/Lon → UTM ou enregistrez directement.";
+    });
   });
 
   $("tfConvertLatLon")?.addEventListener("click",convertLatLonToUtmManual);
